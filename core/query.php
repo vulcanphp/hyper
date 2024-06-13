@@ -43,7 +43,7 @@ class query
             $data = [$data];
         }
         $fields     = array_keys($data[0]);
-        $statement  = $this->database->getPdo()->prepare(
+        $statement  = $this->database->prepare(
             sprintf(
                 // base sql schema
                 "%s %s INTO `{$this->table}` (%s) VALUES %s %s;",
@@ -237,7 +237,7 @@ class query
         if (isset($data[0]) && is_array($data[0])) {
             throw new Exception('Invalid data format to update');
         }
-        $statement = $this->database->getPdo()->prepare(
+        $statement = $this->database->prepare(
             sprintf(
                 "UPDATE `{$this->table}` SET %s %s",
                 implode(', ', array_map(fn ($attr) => "$attr=:$attr", array_keys($data))),
@@ -259,7 +259,7 @@ class query
         if (!$this->hasWhere()) {
             throw new Exception('Invalid delete condition');
         }
-        $statement = $this->database->getPdo()->prepare(
+        $statement = $this->database->prepare(
             "DELETE FROM `{$this->table}` " . $this->getWhereSql()
         );
         $this->bindWhere($statement);
@@ -362,7 +362,7 @@ class query
         if (empty($this->query['sql'])) {
             $this->select();
         }
-        $statement = $this->database->getPdo()->prepare(
+        $statement = $this->database->prepare(
             $this->query['sql']
                 . $this->query['joins']
                 . $this->getWhereSql()
@@ -419,7 +419,7 @@ class query
         if ($this->database->config['driver'] === 'sqlite') {
             $paginator->total = $this->count();
         } else {
-            $total = $this->database->getPdo()->prepare('SELECT FOUND_ROWS()');
+            $total = $this->database->prepare('SELECT FOUND_ROWS()');
             $total->execute();
             $paginator->total = $total->fetch(PDO::FETCH_COLUMN);
         }
@@ -430,7 +430,7 @@ class query
 
     public function count(): int
     {
-        $statement = $this->database->getPdo()->prepare(
+        $statement = $this->database->prepare(
             "SELECT COUNT() FROM {$this->table} as p "
                 . (!empty($this->query['joins']) ? $this->query['joins'] : '')
                 . $this->getWhereSql()

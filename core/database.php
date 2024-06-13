@@ -4,6 +4,7 @@ namespace core;
 
 use Exception;
 use PDO;
+use PDOStatement;
 
 class database
 {
@@ -19,22 +20,37 @@ class database
         return $this->pdo;
     }
 
+    public function query($statement, int|null $fetchMode = null, ...$fetch_mode_args): PDOStatement|false
+    {
+        debugger('query', $statement);
+        return $this->getPdo()->query($statement, $fetchMode, ...$fetch_mode_args);
+    }
+
+    public function prepare(string $statement, array $options = []): PDOStatement|false
+    {
+        debugger('query', $statement);
+        return $this->getPdo()->prepare($statement, $options);
+    }
+
     public function __call(string $name, array $args)
     {
         if (!method_exists($this->getPdo(), $name)) {
             throw new Exception(sprintf('Undefined Method (%s) In Query', $name));
         }
+        debugger('query', $args);
         return call_user_func_array([$this->getPdo(), $name], $args);
     }
 
     public function resetPdo(): self
     {
+        $dsn = $this->buildDsn();
         $this->pdo = new PDO(
-            $this->buildDsn(),
+            $dsn,
             $this->config['user'] ?? null,
             $this->config['password'] ?? null,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         );
+        debugger('app', "database initialized for: {$dsn}");
         return $this;
     }
 

@@ -7,6 +7,7 @@ use core\request;
 use core\response;
 use core\router;
 use core\template;
+use core\utils\cache;
 use core\utils\collect;
 use core\utils\session;
 
@@ -92,9 +93,9 @@ function dd(...$args)
     exit(0);
 }
 
-function log(string $type, string $message): void
+function debugger(string $type, mixed $log): void
 {
-    application::$app->debugger->log($type, $message);
+    application::$app->debugger->log($type, $log);
 }
 
 function csrf_token(): ?string
@@ -115,4 +116,9 @@ function user(): ?array
 function collect(array $items = []): collect
 {
     return collect::make($items);
+}
+
+function cache(string $name): cache
+{
+    return new cache($name);
 }

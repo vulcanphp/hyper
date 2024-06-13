@@ -32,13 +32,12 @@ class template
 
     public function template(string $template, array $context = []): string
     {
+        $template = application::$app->path . '/app/templates/' . rtrim($template, '.php') . '.php';
+        debugger('template', "template rendering from: {$template}");
         $context = array_merge($this->context, $context);
-
-        // Ensure the context variables are available in the template
         extract($context);
-
         ob_start();
-        include application::$app->path . '/app/templates/' . rtrim($template, '.php') . '.php';
+        include $template;
         return ob_get_clean();
     }
 }

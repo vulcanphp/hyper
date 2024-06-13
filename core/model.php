@@ -56,6 +56,7 @@ class model
             $this->id = $status;
         }
         if ($status) {
+            $this->decodeSavedData();
             $this->afterSavedData();
         }
         return $status;
@@ -76,7 +77,7 @@ class model
             $data = $this->uploadChanges($data);
         }
         foreach ($data as $key => $value) {
-            $data[$key] = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
+            $data[$key] = is_array($value) ? json_encode($value) : $value;
         }
         return $data;
     }
@@ -90,9 +91,8 @@ class model
 
     private function afterRemovedData(): void
     {
-        $data = $this->toArray();
         if (method_exists($this, 'removeUploaded')) {
-            $this->removeUploaded($data);
+            $this->removeUploaded($this->toArray());
         }
     }
 

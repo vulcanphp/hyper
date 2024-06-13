@@ -48,6 +48,74 @@ class collect
         return $this;
     }
 
+    public function pop(): mixed
+    {
+        return array_pop($this->items);
+    }
+
+    public function push(...$values): self
+    {
+        array_push($this->items, ...$values);
+        return $this;
+    }
+
+    public function shift(): mixed
+    {
+        return array_shift($this->items);
+    }
+
+    public function unshift(...$values): self
+    {
+        array_unshift($this->items, ...$values);
+        return $this;
+    }
+
+    public function merge(array ...$arrays): self
+    {
+        $this->items = array_merge($this->items, ...$arrays);
+        return $this;
+    }
+
+    public function reduce(callable $callback, $initial = null)
+    {
+        return array_reduce($this->items, $callback, $initial);
+    }
+
+    public function sort(?callable $callback = null): self
+    {
+        if ($callback) {
+            usort($this->items, $callback);
+        } else {
+            sort($this->items);
+        }
+        return $this;
+    }
+
+    public function sortKeys(?callable $callback = null): self
+    {
+        if ($callback) {
+            uksort($this->items, $callback);
+        } else {
+            ksort($this->items);
+        }
+        return $this;
+    }
+
+    public function keys()
+    {
+        return new self(array_keys($this->items));
+    }
+
+    public function unique(): self
+    {
+        return new self(array_unique($this->items, SORT_REGULAR));
+    }
+
+    public function reverse(): self
+    {
+        return new self(array_reverse($this->items, true));
+    }
+
     public function filter(callable $callback): self
     {
         return new self(array_filter($this->items, $callback, ARRAY_FILTER_USE_BOTH));
@@ -76,9 +144,36 @@ class collect
         return new self(array_filter($results));
     }
 
-    public function reduce(callable $callback, $initial = null)
+    public function slice(int $offset, ?int $limit = null, bool $preserve_keys = false)
     {
-        return array_reduce($this->items, $callback, $initial);
+        return new self(array_slice($this->items, $offset, $limit, $preserve_keys));
+    }
+
+    public function where(string $key, $value): self
+    {
+        return new self(array_filter($this->items, fn ($item) => is_array($item) && ($item[$key] ?? null) === $value));
+    }
+
+    public function except(array $keys): self
+    {
+        return new self(array_diff_key($this->items, array_flip($keys)));
+    }
+
+    public function only(array $keys): self
+    {
+        return new self(array_intersect_key($this->items, array_flip($keys)));
+    }
+
+    public function group(string $group): self
+    {
+        $array = [];
+        foreach ($this->items as $k => $value) {
+            $key = is_array($value) ? $value[$group] : (is_object($value) ? $value->$group : null);
+            if ($key !== null) {
+                $array[$key][$k] = $value;
+            }
+        }
+        return new self($array);
     }
 
     public function find(callable $callback, $default = null)
@@ -91,23 +186,16 @@ class collect
         return $default;
     }
 
-    public function where(string $key, $value): self
-    {
-        return new self(array_filter($this->items, fn ($item) => is_array($item) && ($item[$key] ?? null) === $value));
-    }
-
     public function first(callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
             return $this->items[0] ?? $default;
         }
-
         foreach ($this->items as $key => $value) {
             if ($callback($value, $key)) {
                 return $value;
             }
         }
-
         return $default;
     }
 
@@ -116,13 +204,11 @@ class collect
         if (is_null($callback)) {
             return $this->items[count($this->items) - 1] ?? $default;
         }
-
         foreach (array_reverse($this->items, true) as $key => $value) {
             if ($callback($value, $key)) {
                 return $value;
             }
         }
-
         return $default;
     }
 
@@ -131,13 +217,13 @@ class collect
         return count($this->items);
     }
 
-    public function toArray(): array
-    {
-        return $this->items;
-    }
-
     public function toJson(): string
     {
         return json_encode($this->items);
+    }
+
+    public function toString(array|string $operator = ""): string
+    {
+        return implode($operator, $this->items);
     }
 }

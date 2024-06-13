@@ -11,7 +11,7 @@ $app = new application(
         __DIR__ . '/app/web/providers.php',
         __DIR__ . '/app/web/middlewares.php',
     ],
-    providers: ['csrfProtectionProvider'],
+    providers: ['checkSysLoad', 'csrfProtectionProvider'],
     middlewares: ['csrfProtectionMiddleware'],
     env: [
         'debug' => true,
