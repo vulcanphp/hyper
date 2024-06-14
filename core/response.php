@@ -4,11 +4,19 @@ namespace core;
 
 class response
 {
+    private array $outputFilters;
+
     public function __construct(
         public string $content = '',
         public int $statusCode = 200,
         public array $headers = []
     ) {
+    }
+
+    public function addOutputFilter(callable $callback): self
+    {
+        $this->outputFilters[] = $callback;
+        return $this;
     }
 
     public function setContent(string $content): self
@@ -28,7 +36,7 @@ class response
         $this->setStatusCode($statusCode);
         $this->setHeader('Content-Type', 'application/json; charset=utf-8');
         $this->setContent(
-            json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
+            json_encode($data, JSON_PRETTY_PRINT)
         );
         return $this;
     }
@@ -57,6 +65,13 @@ class response
         foreach ($this->headers as $key => $value) {
             header("$key: $value");
         }
+
+        if (isset($this->outputFilters)) {
+            foreach ($this->outputFilters as $filter) {
+                $this->content = call_user_func($filter, $this->content);
+            }
+        }
+
         echo $this->content;
     }
 }

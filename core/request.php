@@ -4,16 +4,8 @@ namespace core;
 
 class request
 {
-    public string $method;
-    public string $path;
-    public array $params = [];
-    public string $rootUrl;
-    public string $url;
-    public array $queryParams;
-    public array $postParams;
-    public array $fileUploads;
-    public array $serverParams;
-    public ?array $user = null;
+    public string $method, $path, $rootUrl, $url;
+    public array $queryParams, $postParams, $fileUploads, $serverParams, $user, $params = [];
 
     public function __construct()
     {
@@ -39,7 +31,6 @@ class request
                 }
             }
         }
-
         return [];
     }
 
@@ -112,5 +103,10 @@ class request
     {
         $name = 'HTTP_' . str_replace('-', '_', strtoupper($name));
         return $this->server($name, $defaultValue);
+    }
+
+    public function accept(string $contentType): bool
+    {
+        return strpos($this->header('accept', ''), $contentType) !== false;
     }
 }

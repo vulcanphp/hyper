@@ -22,11 +22,9 @@ class template
     public function render(string $template, array $context = []): string
     {
         $content = $this->template($template, $context);
-
         if ($this->layout) {
             return $this->template($this->layout, ['content' => $content]);
         }
-
         return $content;
     }
 

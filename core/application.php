@@ -2,20 +2,16 @@
 
 namespace core;
 
-use core\utils\cache;
-use core\utils\session;
-use core\utils\debugger;
-
 class application
 {
     public static application $app;
+    public debugger $debugger;
     public request $request;
     public response $response;
     public router $router;
     public session $session;
     public database $database;
-    public debugger $debugger;
-    public cache $cache;
+    public translator $translator;
 
     public function __construct(
         public string $path,
@@ -26,52 +22,75 @@ class application
         array $requirePath = []
     ) {
         self::$app = $this;
-        $this->debugger = new debugger($this->env['debug'] ?? false);
+
+        // register debugger
+        $this->debugger = new debugger($env['debug']);
         $this->debugger->log('app', 'creating application');
+
+        // load application core
         $this->session = new session();
         $this->request = new request();
         $this->response = new response();
         $this->router = new router(new middleware());
-        $this->cache = new cache('app');
-        $this->database = new database($this->env['database'] ?? []);
+        $this->database = new database($env['database']);
+
+        // application default translator
+        $this->translator = new translator();
+        $this->translator->load($env['lang'], $env['lang_dir']);
+
         if ($routesPath !== null) {
             $this->debugger->log('app', "loading routes from: {$routesPath}");
             foreach (require $routesPath as $route) {
                 $this->router->add(...$route);
             }
         }
+
         foreach ($requirePath as $require) {
             $this->debugger->log('app', "require file from: {$require}");
             require $require;
         }
+
         $this->debugger->log('app', 'application created');
     }
 
-    public function addServiceProvider(callable $provider): void
+    public function addServiceProvider(callable $provider): self
     {
         $this->providers[] = $provider;
+        return $this;
     }
 
-    public function addRouteMiddleware(callable $middleware): void
+    public function addRouteMiddleware(callable $middleware): self
     {
         $this->middlewares[] = $middleware;
+        return $this;
     }
 
     public function run(): void
     {
         $this->debugger->log('app', 'running providers, total (' . count($this->providers) . ')');
+
         // Run service providers
         foreach ($this->providers as $provider) {
             call_user_func($provider, $this);
         }
+
         // Add Router middleware
         foreach ($this->middlewares as $middleware) {
             $this->router->getMiddleware()->add($middleware);
         }
+
         // Dispatch the router
         $this->debugger->log('app', 'despatching router');
+
+        // dispatch view response
         $response = $this->router->dispatch($this->request);
+
+        // save translator changes
+        $this->translator->save();
+
+        // send response to client
         $response->send();
+
         $this->debugger->log('app', 'response sent');
     }
 }

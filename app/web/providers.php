@@ -1,6 +1,7 @@
 <?php
 
 use core\application;
+use core\translator;
 
 function checkSysLoad()
 {

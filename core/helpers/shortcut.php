@@ -9,7 +9,8 @@ use core\router;
 use core\template;
 use core\utils\cache;
 use core\utils\collect;
-use core\utils\session;
+use core\session;
+use core\translator;
 
 // Foundation Shortcut
 function app(): application
@@ -90,7 +91,7 @@ function dump(...$args)
 function dd(...$args)
 {
     dump(...$args);
-    exit(0);
+    die(0);
 }
 
 function debugger(string $type, mixed $log): void
@@ -108,7 +109,7 @@ function csrf(): string
     return sprintf('<input type="hidden" name="_token" value="%s" />', csrf_token());
 }
 
-function user(): ?array
+function user(): array
 {
     return application::$app->request->user;
 }
@@ -121,4 +122,15 @@ function collect(array $items = []): collect
 function cache(string $name): cache
 {
     return new cache($name);
+}
+
+
+function translator(): translator
+{
+    return application::$app->translator;
+}
+
+function __(?string $text = '', bool $strict = false): ?string
+{
+    return application::$app->translator->translate($text, $strict);
 }

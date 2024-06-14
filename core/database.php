@@ -2,19 +2,19 @@
 
 namespace core;
 
-use Exception;
 use PDO;
 use PDOStatement;
 
 class database
 {
-    public function __construct(public array $config = [], public ?PDO $pdo = null)
+    public PDO $pdo;
+    public function __construct(public array $config = [])
     {
     }
 
     public function getPdo(): PDO
     {
-        if ($this->pdo === null) {
+        if (!isset($this->pdo)) {
             $this->resetPdo();
         }
         return $this->pdo;
@@ -34,9 +34,6 @@ class database
 
     public function __call(string $name, array $args)
     {
-        if (!method_exists($this->getPdo(), $name)) {
-            throw new Exception(sprintf('Undefined Method (%s) In Query', $name));
-        }
         debugger('query', $args);
         return call_user_func_array([$this->getPdo(), $name], $args);
     }
@@ -56,14 +53,14 @@ class database
 
     private function buildDsn(): string
     {
-        return match ($this->config['driver'] ?? 'mysql') {
-            'sqlite' => sprintf('sqlite:%s', $this->config['file'] ?? throw new Exception('SQLite (file) not specified')),
+        return match ($this->config['driver'] ?? 'sqlite') {
+            'sqlite' => sprintf('sqlite:%s', $this->config['file'] ?? root_dir('sqlite.db')),
             default => sprintf(
                 '%s:host=%s;port=%s;dbname=%s;charset=%s;',
-                $this->config['driver'] ?? 'mysql',
-                $this->config['host'] ?? '',
-                $this->config['port'] ?? '',
-                $this->config['name'] ?? '',
+                $this->config['driver'],
+                $this->config['host'],
+                $this->config['port'],
+                $this->config['name'],
                 $this->config['charset'] ?? 'utf8mb4'
             ),
         };

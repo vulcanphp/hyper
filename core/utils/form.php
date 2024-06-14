@@ -132,8 +132,8 @@ class form
     private function parseFieldData(array $field): array
     {
         $field['id'] = $field['id'] ?? $field['name'];
-        $field['label'] = $field['label'] ?? ucwords(str_replace(['-', '_'], ' ', $field['name']));
-        $field['placeholder'] = $field['placeholder'] ?? $field['label'];
+        $field['label'] = __($field['label'] ?? ucwords(str_replace(['-', '_'], ' ', $field['name'])));
+        $field['placeholder'] = isset($field['placeholder']) ? __($field['placeholder']) : $field['label'];
         $field['value'] = $field['type'] == 'file' ? (($oldFile = $this->request->post('_' . $field['name'])) != null ? ($field['multiple'] ? explode(',', $oldFile) : $oldFile) : $field['value']) : $field['value'];
         return $field;
     }
@@ -191,7 +191,7 @@ class form
         if (empty($field['errors'])) {
             return '';
         }
-        $errorMessages = array_map(fn ($error) => "<li class=\"{errorListItemClass}\">$error</li>", $field['errors']);
+        $errorMessages = array_map(fn ($error) => "<li class=\"{errorListItemClass}\">" . __($error) . "</li>", $field['errors']);
         $errorMessages = implode("\n", $errorMessages);
         return <<<HTML
             <ul class="{errorListClass}">

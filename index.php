@@ -15,6 +15,8 @@ $app = new application(
     middlewares: ['csrfProtectionMiddleware'],
     env: [
         'debug' => true,
+        'lang' => 'bn',
+        'lang_dir' => __DIR__ . '/public/i18n',
         'database' => [
             'driver' => 'sqlite',
             'file' => __DIR__ . '/sqlite.db'

@@ -26,7 +26,7 @@ $this->layout('layout/master');
                     'errorListClass' => 'alert alert-danger py-1 list-unstyled mt-1',
                     'errorListItemClass' => 'small'
                 ]); ?>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary"><?= __('Submit') ?></button>
             </form>
         </div>
     </div>

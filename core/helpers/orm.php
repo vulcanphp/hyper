@@ -71,7 +71,7 @@ trait orm
                 ->fetch(PDO::FETCH_ASSOC)
                 ->select("p.*, t1.{$data[0]->table()}_id, t1.{$object->table()}_id")
                 ->join($config['table'], "t1.{$object->table()}_id = p.id")
-                ->whereIn("t1.{$data[0]->table()}_id", array_unique(collect($data)->map(fn ($d) => $d->id)->all()))
+                ->where(["t1.{$data[0]->table()}_id" => collect($data)->pluck('id')->unique()->all()])
                 ->result(),
             $object,
             $with
@@ -86,7 +86,7 @@ trait orm
             $object->query()
                 ->select()
                 ->fetch(PDO::FETCH_ASSOC)
-                ->whereIn("{$data[0]->table()}_id", array_unique(collect($data)->map(fn ($d) => $d->id)->all()))
+                ->where(["{$data[0]->table()}_id" => collect($data)->pluck('id')->unique()->all()])
                 ->result(),
             $object,
             $with
@@ -114,7 +114,7 @@ trait orm
         $objects = $object->query()
             ->select()
             ->fetch(PDO::FETCH_ASSOC)
-            ->whereIn('id', array_unique(collect($data)->map(fn ($d) => $d->{"{$object->table()}_id"})->all()))
+            ->where(['id' => collect($data)->pluck("{$object->table()}_id")->unique()->all()])
             ->result();
         foreach ($data as $d) {
             if (!isset($d->orm[$with])) {

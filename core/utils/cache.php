@@ -8,17 +8,11 @@ class cache
 {
     protected string $cachePath;
     protected array $cacheData = [];
-    protected bool $erased = false, $cached = false;
+    protected bool $erased = false, $cached = false, $changed = false;
 
     public function __construct(protected string $name)
     {
-        $cacheDir = root_dir('public/tmp');
-        if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0777, true);
-        } elseif (!is_writable($cacheDir)) {
-            throw new RuntimeException("Cache directory is not writable.");
-        }
-        $this->cachePath = $cacheDir . '/' . md5($name) . '.cache';
+        $this->cachePath = root_dir('public/tmp') . '/' . md5($name) . '.cache';
     }
 
     public function reload(): self
@@ -28,7 +22,7 @@ class cache
             $this->cacheData = file_exists($this->cachePath)
                 ? json_decode(file_get_contents($this->cachePath), true)
                 : [];
-            debugger('cache', "cache loaded for:{$this->name} on: {$this->cachePath}");
+            debugger('cache', "cache loaded ({$this->name}) from: {$this->cachePath}");
         }
         return $this;
     }
@@ -44,11 +38,14 @@ class cache
 
     public function store(string $key, mixed $data, ?string $expire = null): self
     {
-        return $this->updateCacheData($key, [
+        $this->reload();
+        $this->cacheData[$key] = [
             'time' => time(),
             'expire' => $expire !== null ? strtotime($expire) - time() : 0,
             'data' => serialize($data),
-        ]);
+        ];
+        $this->changed = true;
+        return $this;
     }
 
     public function load(string $key, callable $callback, ?string $expire = null): mixed
@@ -70,7 +67,7 @@ class cache
         $results = [];
         foreach ((array)$keys as $key) {
             if ($this->has($key)) {
-                $results[$key] = unserialize($this->getCacheData($key)['data']);
+                $results[$key] = unserialize($this->cacheData[$key]['data']);
             }
         }
         return is_array($keys) ? $results : ($results[$keys] ?? null);
@@ -81,65 +78,58 @@ class cache
         if ($eraseExpired) {
             $this->eraseExpired();
         }
-        return array_map(fn ($entry) => unserialize($entry['data']), $this->getCacheData());
+        return array_map(fn ($entry) => unserialize($entry['data']), $this->cacheData);
     }
 
     public function erase(string|array $keys): self
     {
+        $this->reload();
         foreach ((array)$keys as $key) {
-            $this->unsetCache($key);
+            unset($this->cacheData[$key]);
         }
-        return $this->saveCacheFile();
+        $this->changed = true;
+        return $this;
     }
 
     public function eraseExpired(): self
     {
+        $this->reload();
         if (!$this->erased) {
             $this->erased = true;
-            $this->cacheData = array_filter($this->getCacheData(), fn ($entry) => !$this->isExpired($entry['time'], $entry['expire']));
-            $this->saveCacheFile();
+            foreach ($this->cacheData as $key => $entry) {
+                if ($this->isExpired($entry['time'], $entry['expire'])) {
+                    unset($this->cacheData[$key]);
+                    $this->changed = true;
+                }
+            }
         }
         return $this;
     }
 
     public function flush(): self
     {
-        if (file_exists($this->cachePath)) {
-            unlink($this->cachePath);
-        }
-        debugger('cache', "cache flushed for:{$this->name} on: {$this->cachePath}");
+        $this->cachePath = [];
+        $this->changed = true;
+        debugger('cache', "cache flushed ({$this->name}) from: {$this->cachePath}");
         return $this;
-    }
-
-    private function getCacheData(?string $key = null): ?array
-    {
-        $this->reload();
-        return $key !== null ? ($this->cacheData[$key] ?? null) : $this->cacheData;
-    }
-
-    private function saveCacheFile(): self
-    {
-        file_put_contents($this->cachePath, json_encode($this->cacheData));
-        debugger('cache', "cache saved for:{$this->name} on: {$this->cachePath}");
-        return $this;
-    }
-
-    private function unsetCache(string $key): self
-    {
-        $this->reload();
-        unset($this->cacheData[$key]);
-        return $this;
-    }
-
-    private function updateCacheData(string $key, array $data): self
-    {
-        $this->reload();
-        $this->cacheData[$key] = $data;
-        return $this->saveCacheFile();
     }
 
     private function isExpired(int $timestamp, int $expiration): bool
     {
         return $expiration !== 0 && ((time() - $timestamp) > $expiration);
+    }
+
+    public function __destruct()
+    {
+        if ($this->changed) {
+            if (!is_dir($cacheDir = root_dir('public/tmp'))) {
+                mkdir($cacheDir, 0777, true);
+            }
+            if (file_put_contents($this->cachePath, json_encode($this->cacheData), LOCK_EX)) {
+                debugger('cache', "cache saved ({$this->name}) to: {$this->cachePath}");
+            } else {
+                debugger('cache', "failed to save cache ({$this->name}) to: {$this->cachePath}");
+            }
+        }
     }
 }

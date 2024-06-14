@@ -56,10 +56,10 @@ class router
 
     public function dispatch(request $request): response
     {
-        debugger('router', 'matching routes, total (' . count($this->routes) . ')');
+        debugger('app', 'matching routes, total (' . count($this->routes) . ')');
         foreach ($this->routes as $route) {
             if ($this->match($route['method'], $route['path'], $request)) {
-                debugger('router', "route matched: {$route['path']}");
+                debugger('app', "route matched: {$route['path']}");
                 foreach ($route['middleware'] as $middleware) {
                     $this->middleware->add($middleware);
                 }
@@ -72,11 +72,11 @@ class router
                 } elseif (is_array($route['callback']) && is_string($route['callback'][0])) {
                     $route['callback'][0] = new $route['callback'][0];
                 }
-                debugger('router', 'dispatched route');
+                debugger('app', 'dispatched route');
                 return call_user_func($route['callback'], $request, ...$request->params);
             }
         }
-        debugger('router', "route not matched");
+        debugger('app', "route not matched");
         return new response('Not Found', 404);
     }
 

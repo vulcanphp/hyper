@@ -3,7 +3,6 @@
 namespace core;
 
 use core\utils\paginator;
-use Exception;
 use PDO;
 
 class query
@@ -92,12 +91,6 @@ class query
         return $this->database->pdo->lastInsertId();
     }
 
-    public function replace(array $data, array $config = []): int
-    {
-        $config['replace'] = true;
-        return $this->insert($data, $config);
-    }
-
     public function bulkUpdate(array $data, array $config = []): int
     {
         if (!(isset($data[0]) && is_array($data[0]))) {
@@ -144,19 +137,6 @@ class query
         return $this;
     }
 
-    public function whereIn(string $field, array $values): self
-    {
-        return $this->where(
-            sprintf("%s IN('%s')", $field, join("','", array_map(fn ($value) => addslashes($value), $values)))
-        );
-    }
-
-    public function match(string $match, string $condition, ?string $mode = null): self
-    {
-        $mode = $mode !== null ? sprintf(' in %s mode', $mode) : '';
-        return $this->where("MATCH ({$match}) AGAINST ('{$condition}'{$mode})");
-    }
-
     public function andWhere($conditions): self
     {
         return $this->addWhere('AND', $conditions);
@@ -192,7 +172,7 @@ class query
 
             $this->where['bind'] = array_merge($this->where['bind'], $conditions);
         } elseif (is_string($conditions)) {
-            $command = sprintf('%s %s', $method, $conditions);
+            $command = "{$method} {$conditions}";
         }
         $this->where['sql'] .= sprintf(' %s ', empty($this->where['sql']) ? ltrim($command, $method . ' ') : $command);
         return $this;
@@ -222,20 +202,16 @@ class query
         }
     }
 
-    private function resetWhere(): self
+    private function resetWhere(): void
     {
         $this->where = ['sql' => '', 'bind' => []];
-        return $this;
     }
 
     public function update(array $data, $where = null): bool
     {
         $this->where($where);
         if (!$this->hasWhere()) {
-            throw new Exception('Invalid update condition');
-        }
-        if (isset($data[0]) && is_array($data[0])) {
-            throw new Exception('Invalid data format to update');
+            return false;
         }
         $statement = $this->database->prepare(
             sprintf(
@@ -257,18 +233,16 @@ class query
     {
         $this->where($where);
         if (!$this->hasWhere()) {
-            throw new Exception('Invalid delete condition');
+            return false;
         }
-        $statement = $this->database->prepare(
-            "DELETE FROM `{$this->table}` " . $this->getWhereSql()
-        );
+        $statement = $this->database->prepare("DELETE FROM `{$this->table}` " . $this->getWhereSql());
         $this->bindWhere($statement);
         $statement->execute();
         $this->resetWhere();
         return $statement->rowCount();
     }
 
-    public function select($fields = '*'): self
+    public function select(array|string $fields = '*'): self
     {
         if (is_array($fields)) {
             $fields = implode(',', $fields);
@@ -299,15 +273,14 @@ class query
 
     private function addJoin(string $type, string $table, string $condition): self
     {
-        $alias  = sprintf('t%s', ++$this->query['join_num']);
-        $join   = sprintf(
+        $alias = sprintf('t%s', ++$this->query['join_num']);
+        $this->query['joins'] .= sprintf(
             " %s JOIN %s %s ON %s ",
             $type,
             $table,
             stripos($table, ' AS ') === false ? ' AS ' . $alias : '',
             $condition
         );
-        $this->query['joins'] .= $join;
         return $this;
     }
 
@@ -368,7 +341,7 @@ class query
                 . $this->getWhereSql()
                 . (isset($this->query['group']) ? ' GROUP BY ' . trim($this->query['group']) : '')
                 . (isset($this->query['having']) ? ' HAVING ' . trim($this->query['having']) : '')
-                . (isset($this->query['order']) && $this->query['order'] != 'none' ? ' ORDER BY ' . trim($this->query['order']) : '')
+                . (isset($this->query['order']) ? ' ORDER BY ' . trim($this->query['order']) : '')
                 . (isset($this->query['limit']) ? ' LIMIT ' . trim($this->query['limit']) : '')
         );
         $this->bindWhere($statement);
@@ -446,10 +419,5 @@ class query
     {
         $this->query = ['sql' => '', 'joins' => '', 'join_num' => 0];
         $this->resetWhere();
-    }
-
-    public function __call(string $name, array $args)
-    {
-        return call_user_func_array([$this->database, $name], $args);
     }
 }
