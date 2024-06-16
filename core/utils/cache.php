@@ -12,7 +12,7 @@ class cache
 
     public function __construct(protected string $name)
     {
-        $this->cachePath = root_dir('public/tmp') . '/' . md5($name) . '.cache';
+        $this->cachePath = env('tmp_dir') . '/' . md5($name) . '.cache';
     }
 
     public function reload(): self
@@ -122,7 +122,7 @@ class cache
     public function __destruct()
     {
         if ($this->changed) {
-            if (!is_dir($cacheDir = root_dir('public/tmp'))) {
+            if (!is_dir($cacheDir = env('tmp_dir'))) {
                 mkdir($cacheDir, 0777, true);
             }
             if (file_put_contents($this->cachePath, json_encode($this->cacheData), LOCK_EX)) {

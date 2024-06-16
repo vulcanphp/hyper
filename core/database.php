@@ -53,8 +53,8 @@ class database
 
     private function buildDsn(): string
     {
-        return match ($this->config['driver'] ?? 'sqlite') {
-            'sqlite' => sprintf('sqlite:%s', $this->config['file'] ?? root_dir('sqlite.db')),
+        return match ($this->config['driver']) {
+            'sqlite' => sprintf('sqlite:%s', $this->config['file']),
             default => sprintf(
                 '%s:host=%s;port=%s;dbname=%s;charset=%s;',
                 $this->config['driver'],

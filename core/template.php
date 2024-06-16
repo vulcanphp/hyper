@@ -30,7 +30,7 @@ class template
 
     public function template(string $template, array $context = []): string
     {
-        $template = application::$app->path . '/app/templates/' . rtrim($template, '.php') . '.php';
+        $template = application::$app->path . '/templates/' . str_replace('.php', '', $template) . '.php';
         debugger('template', "template rendering from: {$template}");
         $context = array_merge($this->context, $context);
         extract($context);

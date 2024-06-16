@@ -23,7 +23,7 @@ class home
     function index()
     {
         $students = $this->model->get()->paginate(4);
-        return template('table', ['paginator' => $students, 'route' => '']);
+        return template('student/table', ['paginator' => $students, 'route' => '']);
     }
 
     function create(request $request)
@@ -39,7 +39,7 @@ class home
             return redirect('/');
         }
 
-        return template('form', ['form' => $form]);
+        return template('student/form', ['form' => $form]);
     }
 
     function edit(request $request, int $id)
@@ -57,6 +57,6 @@ class home
             return redirect('/');
         }
 
-        return template('form', ['form' => $form]);
+        return template('student/form', ['form' => $form]);
     }
 }

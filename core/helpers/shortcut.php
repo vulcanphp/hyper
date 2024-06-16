@@ -2,6 +2,7 @@
 
 use core\application;
 use core\database;
+use core\helpers\vite;
 use core\query;
 use core\request;
 use core\response;
@@ -59,9 +60,26 @@ function template(string $template, array $context = []): response
     return application::$app->response->write($engine->render($template, $context));
 }
 
-function url(string $path = '/'): string
+function url(string $path = ''): string
 {
     return rtrim(application::$app->request->rootUrl . '/' . ltrim($path, '/'), '/');
+}
+
+function public_url(string $path = ''): string
+{
+    return url('public/' . ltrim($path, '/'));
+}
+
+function asset_url(string $path = ''): string
+{
+    $path = application::$app->env['asset_url'] . ltrim($path, '/');
+    return strpos($path, '/', 0) === 0 ? url($path) : $path;
+}
+
+function media_url(string $path = ''): string
+{
+    $path = application::$app->env['media_url'] . ltrim($path, '/');
+    return strpos($path, '/', 0) === 0 ? url($path) : $path;
 }
 
 function request_url(): string
@@ -69,14 +87,19 @@ function request_url(): string
     return application::$app->request->url;
 }
 
-function route(string $name, ?string $context = null): string
+function route_url(string $name, ?string $context = null): string
 {
     return url(application::$app->router->route($name, $context));
 }
 
-function root_dir(string $path = '/'): string
+function app_dir(string $path = '/'): string
 {
     return rtrim(application::$app->path . '/' . ltrim($path), '/');
+}
+
+function root_dir(string $path = ''): string
+{
+    return rtrim(ROOT_DIR . '/' . ltrim($path, '/'), '/');
 }
 
 // Helper/Utils Shortcut
@@ -92,6 +115,11 @@ function dd(...$args)
 {
     dump(...$args);
     die(0);
+}
+
+function env(string $key, $default = null): string|array
+{
+    return application::$app->env[$key] ??  $default;
 }
 
 function debugger(string $type, mixed $log): void
@@ -124,13 +152,17 @@ function cache(string $name): cache
     return new cache($name);
 }
 
-
-function translator(): translator
-{
-    return application::$app->translator;
-}
-
 function __(?string $text = '', bool $strict = false): ?string
 {
     return application::$app->translator->translate($text, $strict);
+}
+
+function vite($config): vite
+{
+    return new vite($config);
+}
+
+function template_exists(string $template): bool
+{
+    return file_exists(app_dir('templates/' . str_replace('.php', '', $template) . '.php'));
 }

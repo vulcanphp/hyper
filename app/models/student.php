@@ -25,7 +25,7 @@ class student extends model
     {
         return [
             'name' => 'photo',
-            'uploadDir' => root_dir('public/uploads'),
+            'uploadTo' => 'student',
             'extensions' => ['png', 'jpg', 'jpeg'],
         ];
     }

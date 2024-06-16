@@ -18,9 +18,10 @@ trait uploader
             $name = $upload['name'];
             $oldFiles = explode(',', application::$app->request->post('_' . $name, ''));
             if (isset($data[$name]) && (((array)$data[$name]['size'] ?? [])[0] ?? 0) > 0) {
-                unset($upload['name']);
+                $upload['uploadDir'] = env('upload_dir') . '/' . ($upload['uploadTo'] ?? '');
+                unset($upload['name'], $upload['uploadTo']);
                 $uploader = new utilsUploader(...$upload);
-                $data[$name] = $this->clearSavedPath($uploader->upload($data[$name]), $upload['uploadDir']);
+                $data[$name] = $this->clearSavedPath($uploader->upload($data[$name]), env('upload_dir'));
                 $this->removeFiles($oldFiles);
             } else {
                 $data[$name] = count($oldFiles) == 1 ? $oldFiles[0] : $oldFiles;
@@ -48,7 +49,7 @@ trait uploader
     protected function removeFiles(string|array $files): void
     {
         foreach ((array) $files as $file) {
-            if (file_exists($filePath = $this->uploadDir($file))) {
+            if (file_exists($filePath = env('upload_dir') . '/' . $file)) {
                 unlink($filePath);
             }
         }
@@ -68,15 +69,5 @@ trait uploader
         $path = trim($path, DIRECTORY_SEPARATOR);
         $path = trim($path, '/');
         return $path;
-    }
-
-    public function uploadDir(string $path = '/'): string
-    {
-        return rtrim($this->uploader()['uploadDir'] . '/' . ltrim($path, '/'), '/');
-    }
-
-    public function uploadUrl(string $path = '/'): string
-    {
-        return rtrim(str_replace(root_dir(), url(), $this->uploader()['uploadDir']) . '/' . ltrim($path, '/'), '/');
     }
 }

@@ -77,6 +77,9 @@ class router
             }
         }
         debugger('app', "route not matched");
+        if (template_exists('errors/404')) {
+            return template('errors/404')->setStatusCode(404);
+        }
         return new response('Not Found', 404);
     }
 

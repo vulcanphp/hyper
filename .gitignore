@@ -1,8 +1,4 @@
 /vendor
 /node_modules
-/public/storage
-/public/uploads
-/public/cache
-/public/tmp
 /.vscode
 /sqlite.db

@@ -5,7 +5,7 @@
     "keywords": ["vulcanphp", "hyper", "mvt", "web framework", "php framework"],
     "license": "MIT",
     "require": {
-        "php": ">=8.2.20"
+        "php": ">=8.2"
     },
     "authors": [
         {

@@ -1,9 +1,8 @@
 <?php
 
 use core\application;
-use core\translator;
 
-function checkSysLoad()
+function checkSysLoadProvider()
 {
     if (function_exists('sys_getloadavg')) {
         $load = sys_getloadavg();
@@ -16,7 +15,6 @@ function checkSysLoad()
 
 function csrfProtectionProvider(application $app)
 {
-    // set csrf token
     if (!$app->session->has('_token')) {
         $app->session->set('_token', bin2hex(random_bytes(32)));
     }

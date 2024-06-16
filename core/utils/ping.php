@@ -43,7 +43,9 @@ class ping
             $defaultOptions[CURLOPT_FILE] = $download;
         }
 
-        curl_setopt_array($curl, $defaultOptions + $this->config['options']);
+        curl_setopt_array($curl, $defaultOptions);
+        curl_setopt_array($curl, $this->config['options']);
+
         $response = [
             'body'     => curl_exec($curl),
             'status'   => curl_getinfo($curl, CURLINFO_HTTP_CODE),

@@ -1,27 +1,31 @@
 <?php
 
-use core\application;
+/** 
+ * NOTE: THIS index.php FILE ONLY FOR PHP BUILT IN DEVELOPMENT
+ *       SEVER PURPOSE ONLY, NOT FOR PRODUCTION SERVER.
+ *       IN YOUR PRODUCTION SERVER MAKE SURE YOU NGINX AND
+ *       APACHE SERVER REDIRECT ALL THE HTTP REQUEST TO 'public' folder.
+ */
 
-require __DIR__ . '/vendor/autoload.php';
-
-$app = new application(
-    path: __DIR__,
-    routesPath: __DIR__ . '/app/web/routes.php',
-    requirePath: [
-        __DIR__ . '/app/web/providers.php',
-        __DIR__ . '/app/web/middlewares.php',
-    ],
-    providers: ['checkSysLoad', 'csrfProtectionProvider'],
-    middlewares: ['csrfProtectionMiddleware'],
-    env: [
-        'debug' => true,
-        'lang' => 'bn',
-        'lang_dir' => __DIR__ . '/public/i18n',
-        'database' => [
-            'driver' => 'sqlite',
-            'file' => __DIR__ . '/sqlite.db'
-        ]
-    ],
+// Get the requested URI
+$uri = urldecode(
+    parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)
 );
 
-$app->run();
+// Define the path to the public directory
+$publicDir = __DIR__ . '/public';
+
+// Redirect trailing slashes if not a directory
+if (preg_match('/\/$/', $uri) && !is_dir($publicDir . $uri)) {
+    header('Location: ' . rtrim($uri, '/'), true, 301);
+    exit();
+}
+
+// Serve the requested resource as-is if it exists in the public directory
+$filePath = $publicDir . $uri;
+if (file_exists($filePath) && is_file($filePath)) {
+    return false; // Let the server handle it
+}
+
+// Otherwise, route the request to index.php
+require $publicDir . '/index.php';

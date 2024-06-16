@@ -1,7 +1,7 @@
 <?php
 
 $this->set('title', 'Table - Browse Data');
-$this->layout('layout/master');
+$this->layout('student/layout/master');
 
 ?>
 

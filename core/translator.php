@@ -11,12 +11,28 @@ class translator
 {
     private array $translatedTexts, $unknownText;
     private string $localPath, $lang;
+    private bool $loaded = false;
 
-    public static translator $instance;
-
-    public function __construct()
+    public function __construct(string $lang, string $dir)
     {
-        self::$instance = $this;
+        if ($lang != 'en') {
+            $this->lang = $lang;
+            $this->localPath = "{$dir}/{$lang}.json";
+        }
+    }
+
+    private function reload(): void
+    {
+        if (!$this->loaded) {
+            $this->loaded = true;
+            $this->translatedTexts = [];
+
+            if (file_exists($this->localPath)) {
+                debugger('app', "language file loading for ({$this->lang})");
+                $this->translatedTexts = (array) json_decode(file_get_contents($this->localPath), true);
+                debugger('app', "language file loaded");
+            }
+        }
     }
 
     public function translate(?string $text = '', bool $strict = false): ?string
@@ -24,6 +40,8 @@ class translator
         if (!isset($this->lang) || empty($text) || strlen($text) >= 1000 || intval($text) == $text || empty($hash = $this->getHash($text))) {
             return $text;
         }
+
+        $this->reload();
 
         if ($translated = $this->translatedTexts[$hash] ?? null) {
             return $translated;
@@ -36,21 +54,6 @@ class translator
 
         $this->unknownText[] = $text;
         return "[{$hash}/]";
-    }
-
-    public function load(string $lang, string $dir): void
-    {
-        if ($lang != 'en') {
-            $this->lang = $lang;
-            $this->localPath = "{$dir}/{$lang}.json";
-            $this->translatedTexts = [];
-
-            if (file_exists($this->localPath)) {
-                debugger('app', "language file loading for ({$lang})");
-                $this->translatedTexts = (array) json_decode(file_get_contents($this->localPath), true);
-                debugger('app', "language file loaded");
-            }
-        }
     }
 
     private function getHash(string $text): string

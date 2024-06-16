@@ -18,8 +18,8 @@ class application
         public array $env = [],
         private array $providers = [],
         private array $middlewares = [],
-        ?string $routesPath = null,
-        array $requirePath = []
+        private ?string $routesPath = null,
+        private array $requirePath = []
     ) {
         self::$app = $this;
 
@@ -33,22 +33,7 @@ class application
         $this->response = new response();
         $this->router = new router(new middleware());
         $this->database = new database($env['database']);
-
-        // application default translator
-        $this->translator = new translator();
-        $this->translator->load($env['lang'], $env['lang_dir']);
-
-        if ($routesPath !== null) {
-            $this->debugger->log('app', "loading routes from: {$routesPath}");
-            foreach (require $routesPath as $route) {
-                $this->router->add(...$route);
-            }
-        }
-
-        foreach ($requirePath as $require) {
-            $this->debugger->log('app', "require file from: {$require}");
-            require $require;
-        }
+        $this->translator = new translator($env['lang'], $env['lang_dir']);
 
         $this->debugger->log('app', 'application created');
     }
@@ -67,11 +52,24 @@ class application
 
     public function run(): void
     {
+        // Require application files 
+        foreach ($this->requirePath as $require) {
+            $this->debugger->log('app', "require file from: {$require}");
+            require $require;
+        }
+
         $this->debugger->log('app', 'running providers, total (' . count($this->providers) . ')');
 
         // Run service providers
         foreach ($this->providers as $provider) {
             call_user_func($provider, $this);
+        }
+
+        if ($this->routesPath !== null) {
+            $this->debugger->log('app', "loading routes from: {$this->routesPath}");
+            foreach (require $this->routesPath as $route) {
+                $this->router->add(...$route);
+            }
         }
 
         // Add Router middleware
