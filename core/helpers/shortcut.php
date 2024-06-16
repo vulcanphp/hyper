@@ -11,7 +11,6 @@ use core\template;
 use core\utils\cache;
 use core\utils\collect;
 use core\session;
-use core\translator;
 
 // Foundation Shortcut
 function app(): application

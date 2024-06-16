@@ -10,7 +10,7 @@
 
 <body>
 
-    <?= $this->template('student/layout/header') ?>
+    <?= $this->template('layout/header') ?>
 
     <div class="container my-5">
         <div class="row justify-content-center">
@@ -30,7 +30,7 @@
 
     <?= $content ?>
 
-    <?= $this->template('student/layout/footer') ?>
+    <?= $this->template('layout/footer') ?>
 
     <script src="<?= public_url('resources/js/bootstrap.min.js') ?>"></script>
 </body>

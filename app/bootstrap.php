@@ -18,7 +18,7 @@ return new application(
             'driver' => 'sqlite',
             'file' => __DIR__ . '/../sqlite.db'
         ],
-        'lang' => 'bn',
+        'lang' => 'en',
         'lang_dir' => __DIR__ . '/../public/i18n',
         'tmp_dir' => __DIR__ . '/../public/tmp',
         'upload_dir' => __DIR__ . '/../public/uploads',

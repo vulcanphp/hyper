@@ -30,6 +30,13 @@ class student extends model
         ];
     }
 
+    protected function form(): array
+    {
+        return [
+            'gender' => ['type' => 'radio', 'options' => ['M' => 'Male', 'F' => 'Female', 'X' => 'Other']],
+        ];
+    }
+
     protected function orm(): array
     {
         return [

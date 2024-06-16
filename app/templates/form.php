@@ -1,7 +1,7 @@
 <?php
 
 $this->set('title', 'Form - Create and Update Data');
-$this->layout('student/layout/master');
+$this->layout('layout/master');
 
 ?>
 

@@ -3,25 +3,17 @@
 namespace models;
 
 use core\helpers\form;
-use core\helpers\orm;
 use core\model;
 
 class subject extends model
 {
-    use form, orm;
+    use form;
 
     protected string $table = 'subjects';
 
     public string $name;
     public string $code;
     public int $marks;
-
-    protected function orm(): array
-    {
-        return [
-            'students' => ['has' => 'many-x', 'model' => student::class, 'table' => 'students_subjects'],
-        ];
-    }
 
     public function __toString()
     {

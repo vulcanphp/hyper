@@ -5,9 +5,6 @@ namespace views;
 use core\model;
 use core\request;
 use core\utils\form;
-use core\utils\mail;
-use core\utils\ping;
-use core\translator;
 use models\department;
 use models\student;
 use models\subject;
@@ -15,15 +12,20 @@ use models\subject;
 class home
 {
     protected model $model;
+
     function __construct()
     {
-        $this->model = new student();
+        $this->model = match (request()->get('active', 'student')) {
+            'department' => new department(),
+            'subject' => new subject(),
+            default => new student(),
+        };
     }
 
     function index()
     {
         $students = $this->model->get()->paginate(4);
-        return template('student/table', ['paginator' => $students, 'route' => '']);
+        return template('table', ['paginator' => $students]);
     }
 
     function create(request $request)
@@ -39,7 +41,7 @@ class home
             return redirect('/');
         }
 
-        return template('student/form', ['form' => $form]);
+        return template('form', ['form' => $form]);
     }
 
     function edit(request $request, int $id)
@@ -57,6 +59,19 @@ class home
             return redirect('/');
         }
 
-        return template('student/form', ['form' => $form]);
+        return template('form', ['form' => $form]);
+    }
+
+    function delete(request $request, int $id)
+    {
+        $model = $this->model->find($id);
+
+        if ($model->remove()) {
+            session()->set('success', 'Model has been saved.');
+        } else {
+            session()->set('error', 'Failed to save model.');
+        }
+
+        return redirect('/?active=' . $request->get('active', 'student'));
     }
 }
