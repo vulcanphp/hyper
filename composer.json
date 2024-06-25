@@ -5,7 +5,9 @@
     "keywords": ["vulcanphp", "hyper", "mvt", "web framework", "php framework"],
     "license": "MIT",
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "vulcanphp/hyper-core": "^1.0",
+        "vulcanphp/hyper-admin": "^1.0"
     },
     "authors": [
         {
@@ -16,13 +18,9 @@
     "autoload": {
         "psr-4": {
             "app\\": "./app",
-            "core\\": "./core",
             "models\\": "./app/models",
             "views\\": "./app/views"
-        },
-        "files": [
-            "./core/helpers/shortcut.php"
-        ]
+        }
     },
     "config": {
         "optimize-autoloader": true

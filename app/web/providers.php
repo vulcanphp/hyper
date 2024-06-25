@@ -1,6 +1,6 @@
 <?php
 
-use core\application;
+use hyper\application;
 
 function checkSysLoadProvider()
 {

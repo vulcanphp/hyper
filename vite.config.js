@@ -1,14 +1,10 @@
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, splitVendorChunkPlugin } from 'vite'
-import liveReload from 'vite-plugin-live-reload'
 import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
-        liveReload([
-            __dirname + './app/templates/**/*.php',
-        ]),
         splitVendorChunkPlugin()
     ],
     base: process.env.NODE_ENV === "production" ? '/public/resources/build/' : '/public/resources/',

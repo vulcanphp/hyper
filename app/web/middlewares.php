@@ -1,8 +1,8 @@
 <?php
 
-use core\application;
-use core\request;
-use core\response;
+use hyper\application;
+use hyper\request;
+use hyper\response;
 
 function csrfProtectionMiddleware(request $request)
 {

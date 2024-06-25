@@ -1,6 +1,7 @@
 <?php
 
-use core\application;
+use admin\admin;
+use hyper\application;
 
 return new application(
     path: __DIR__,
@@ -9,10 +10,10 @@ return new application(
         __DIR__ . '/web/providers.php',
         __DIR__ . '/web/middlewares.php',
     ],
-    providers: ['checkSysLoadProvider', 'csrfProtectionProvider'],
+    providers: ['checkSysLoadProvider', 'csrfProtectionProvider', [new admin(), 'setup']],
     middlewares: ['csrfProtectionMiddleware'],
     env: [
-        'debug' => true,
+        'debug' => false,
         'secret' => 'c52f493a81826ba866af6bb66a8c67802caf1e1d',
         'database' => [
             'driver' => 'sqlite',
@@ -24,5 +25,6 @@ return new application(
         'upload_dir' => __DIR__ . '/../public/uploads',
         'media_url' => '/public/uploads/',
         'asset_url' => '/public/resources/',
+        'admin' => __DIR__ . '/web/admin.php',
     ],
 );
