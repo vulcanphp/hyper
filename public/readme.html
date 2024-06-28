@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper PHP Framework Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #f4f4f4;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 5px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #ddd;
+        }
+
+        code {
+            display: block;
+            background: #f4f4f4;
+            padding: 10px;
+            margin: 10px 0;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>Documentation</h2>
+        <a href="#installation" class="active">Installation</a>
+        <a href="#folder-structure">Folder Structure</a>
+        <a href="#configuration">Configuration</a>
+        <a href="#routes">Manage Routes</a>
+        <a href="#views">Manage Views</a>
+        <a href="#templates">Manage Templates</a>
+        <a href="#models">Manage Models</a>
+        <a href="#middlewares">Manage Middlewares</a>
+        <a href="#service-providers">Service Providers</a>
+        <a href="#admin">Manage Admin</a>
+        <a href="#vite">Vite Usage</a>
+        <a href="#learn-more">Learn More</a>
+        <a href="#helpful-links">Helpful Links</a>
+    </div>
+    <div class="content">
+        <h1 id="installation">Installation</h1>
+        <p>It is recommended to use <a href="https://getcomposer.org/">Composer</a> to install Hyper.</p>
+        <pre><code>composer create-project vulcanphp/hyper myapp</code></pre>
+        <p>Run the development server using:</p>
+        <pre><code>php -S 127.0.0.1:8080</code></pre>
+        <p><strong>Note:</strong> In a production server, make sure all HTTP requests are redirected to the
+            <u>public/</u> folder for security reasons.
+        </p>
+
+        <h1 id="folder-structure">Folder Structure</h1>
+        <pre><code>root
+├── app
+│   ├── models
+│   ├── templates
+│   ├── views
+│   └── web
+│
+├── public
+│   ├── i18n
+│   ├── resources
+│   ├── tmp
+│   └── uploads
+</code></pre>
+
+        <h1 id="configuration">Application Configuration</h1>
+        <p>Configure your application in the <u>app/bootstrap.php</u> file. Here is an example:</p>
+        <pre><code># app/bootstrap.php
+
+use admin\admin;
+use hyper\application;
+
+return new application(
+    path: __DIR__,
+    routesPath: __DIR__ . '/web/routes.php',
+    requirePath: [
+        __DIR__ . '/web/providers.php',
+        __DIR__ . '/web/middlewares.php',
+    ],
+    providers: ['checkSysLoadProvider', 'csrfProtectionProvider', [new admin(), 'setup']],
+    middlewares: ['csrfProtectionMiddleware'],
+    env: [
+        'debug' => false,
+        'secret' => 'c52f493a81826ba866af6bb66a8c67802caf1e1d',
+        'database' => [
+            'driver' => 'sqlite',
+            'file' => __DIR__ . '/../sqlite.db'
+        ],
+        'lang' => 'en',
+        'lang_dir' => __DIR__ . '/../public/i18n',
+        'tmp_dir' => __DIR__ . '/../public/tmp',
+        'upload_dir' => __DIR__ . '/../public/uploads',
+        'media_url' => '/public/uploads/',
+        'asset_url' => '/public/resources/',
+        'admin' => __DIR__ . '/web/admin.php',
+    ],
+);
+</code></pre>
+
+        <h1 id="routes">Manage Routes</h1>
+        <p>Add routes to your application in the <u>app/web/routes.php</u> file. For example:</p>
+        <pre><code># app/web/routes.php
+
+return [
+    ['path' => '/', 'template' => 'welcome'],
+    ['path' => '/about', 'callback' => fn() => 'About Us Page', 'name' => 'about'],
+    ['path' => '/account', 'callback' => [account::class, 'index'], 'middleware' => ['checkLogin']],
+    ['path' => '/login', 'method' => ['GET', 'POST'], 'callback' => [account::class, 'signIn']],
+];
+</code></pre>
+
+        <h1 id="views">Manage Views</h1>
+        <p>Create view files in the <u>app/views</u> folder with the namespace <mark>views</mark>. For example:</p>
+        <pre><code># app/views/account.php
+
+namespace views;
+use hyper\request;
+
+class account {
+
+    function index(){}
+
+    function signIn(request $request){
+        if($request->method === 'POST'){
+            var_dump($request->all());
+        }
+    }
+
+}
+</code></pre>
+
+        <h1 id="templates">Manage Templates</h1>
+        <p>Create templates in the <u>app/templates</u> folder. First, create a layout for all templates. For
+            example:</p>
+        <pre><code># app/templates/layout.php
+
+&lt;html lang=&quot;en&quot;&gt;
+    &lt;head&gt;
+        &lt;title&gt;&lt;?= $title ?&gt;&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;?= $this-&gt;template(&quot;includes/header&quot;) ?&gt;
+        &lt;?= $content ?&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+        <p>Create a header part in another subfolder called <u>includes</u>:</p>
+        <pre><code># app/templates/includes/header.php
+
+&lt;header&gt;
+    &lt;h1&gt;Welcome to Hyper PHP&lt;/h1&gt;
+&lt;/header&gt;
+</code></pre>
+        <p>Finally, create as many templates as required by your application. For example:</p>
+        <pre><code># app/templates/welcome.php
+
+&lt;?php
+$this-&gt;layout(&quot;layout&quot;);
+$this-&gt;set(&quot;title&quot;, &quot;Welcome to Hyper&quot;);
+?&gt;
+
+&lt;h2&gt;Hyper PHP is a Sweet and MVT Based PHP Tiny Web Framework&lt;/h2&gt;
+</code></pre>
+
+        <h1 id="models">Manage Models</h1>
+        <p>To create new models, go to the <u>app/models</u> folder and create a new model with the namespace
+            <mark>models</mark>. For example:
+        </p>
+        <pre><code># app/models/student.php
+
+use hyper\model;
+
+class student extends model {
+    protected string $table = 'students';
+
+    public string $name;
+    public int $age;
+}
+</code></pre>
+
+        <h1 id="middlewares">Manage Middlewares</h1>
+        <p>To add a new middleware, open the <u>app/web/middlewares.php</u> file and create a function that will
+            process HTTP requests. After creating the function, register it in the router middleware array or globally
+            in the <u>app/bootstrap.php</u> file.</p>
+        <p>Example for the <b>authMiddleware</b>:</p>
+        <pre><code># app/web/middlewares.php
+
+function authMiddleware(request $request) {
+    if (!isset($request->user)) {
+        return new response('Unauthorized', 401);
+    }
+}
+</code></pre>
+        <p>Register the <b>authMiddleware</b>:</p>
+        <pre><code># app/web/routes.php
+
+return [
+    ['path' => '/account', 'middleware' => ['authMiddleware'], ...],
+];
+</code></pre>
+        <p>Or register globally:</p>
+        <pre><code># app/bootstrap.php
+
+return new application(
+    middlewares: ['authMiddleware'],
+    ...
+);
+</code></pre>
+
+        <h1 id="service-providers">Service Providers</h1>
+        <p>To add a new service provider, open the <u>app/web/providers.php</u> file and create a function that
+            will manipulate the current application. Register the service provider in the <u>app/bootstrap.php</u>
+            file.</p>
+        <p>Example for the <b>csrfProtectionProvider</b>:</p>
+        <pre><code># app/web/providers.php
+
+function csrfProtectionProvider(application $app) {
+    if (!$app->session->has('_token')) {
+        $app->session->set('_token', bin2hex(random_bytes(32)));
+    }
+}
+</code></pre>
+        <p>Register in the bootstrap file:</p>
+        <pre><code># app/bootstrap.php
+
+return new application(
+    providers: ['csrfProtectionProvider'],
+    ...
+);
+</code></pre>
+
+        <h1 id="admin">Manage Admin</h1>
+        <p>You can manage your website data under the models in the <u>app/models</u> folder. Register the models
+            in the admin panel to easily process CRUD operations. You can also create custom menus with dynamic output.
+        </p>
+        <p>In the <mark>bootstrap.php</mark> file, the admin provider and customization are added like this:</p>
+        <pre><code># app/bootstrap.php
+
+use admin\admin;
+return new application(
+    providers: [[new admin(), 'setup']],
+    env: [
+        'admin' => __DIR__ . '/web/admin.php',
+    ],
+    ...
+);
+</code></pre>
+        <p>Open the <u>app/web/admin.php</u> file to manage the admin panel. Example:</p>
+        <pre><code># app/web/admin.php
+
+use models\department;
+use models\student;
+use admin\core\modelView;
+use views\settings;
+
+return [
+    // Set up your admin panel login user
+    'user' => [
+        'name' => 'admin', // Whatever name you want
+        'password' => 'admin' // Replace with a strong password in production
+    ],
+    'models' => [
+        department::class, // Add a basic model
+        new modelView(
+            model: student::class,
+            name: 'student',
+            name_plural: 'students',
+            fields: ['id', 'name', 'age', 'department'],
+            search: ['name'],
+            filter: ['gender' => ['M' => 'Male', 'F' => 'Female']],
+            with: ['department'],
+            where: ['deleted' => false],
+            order: 'id DESC',
+            actions: ['Export Selected Students Result Sheet' => url('admin/student/export')]
+        ), // Add a customized model
+    ],
+    'menus' => [
+        // Add a menu with views which will return a string
+        'settings' => [settings::class, 'index'],
+        // Add another menu with a file to get a string output
+        'cms' => __DIR__ . '/../cms/index.php',
+        // Add a simple menu with a hardcoded string
+        'api' => 'sakjadasdas5d1as54d5asd2asd1ds88sdf'
+    ],
+];
+</code></pre>
+
+        <h1 id="vite">Vite Usage</h1>
+        <p>Hyper comes with Vite and Tailwind CSS built-in. Run the following commands to use Vite with Hyper.</p>
+        <p>Install npm and run Vite development:</p>
+        <pre><code>npm install && npm run dev</code></pre>
+        <p>Include the Vite script in your template. For example:</p>
+        <pre><code># app/templates/layout.php
+
+&lt;html lang=&quot;en&quot;&gt;
+    &lt;head&gt;
+        &lt;?= vite([&quot;running&quot; =&gt; true]) ?&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        ...
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+        <p>To run production for Vite:</p>
+        <pre><code>npm run build</code></pre>
+        <p>Change the Vite running status in the PHP template to false:</p>
+        <pre><code># app/templates/layout.php
+
+&lt;html lang=&quot;en&quot;&gt;
+    &lt;head&gt;
+        &lt;?= vite([&quot;running&quot; =&gt; false]) ?&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        ...
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+        <h1 id="learn-more">Learn More</h1>
+        <ul>
+            <li><a href="https://github.com/vulcanphp/hyper-core?tab=readme-ov-file#hypercore">Hyper Core</a></li>
+            <li><a href="https://github.com/vulcanphp/hyper-admin?tab=readme-ov-file#hyper-admin">Hyper Admin</a></li>
+        </ul>
+
+        <h1 id="helpful-links">Helpful Links</h1>
+        <ul>
+            <li><a href="https://github.com/vulcanphp/hyper/issues">Drop a New Issue</a></li>
+            <li><a href="mailto:shahin.moyshan2@gmail.com">Hire For Freelance Work</a></li>
+            <li><a href="https://buymeacoffee.com/vulcandev">Support Hyper Framework</a></li>
+        </ul>
+    </div>
+</body>
+
+</html>

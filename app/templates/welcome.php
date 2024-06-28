@@ -33,21 +33,37 @@
             line-height: 1.6;
         }
 
-        .github-link {
+        .links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .links a {
             display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 10px;
+            margin: 20px 10px;
+            padding: 10px 20px;
             text-align: center;
-            background-color: #3498db;
             color: white;
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
 
-        .github-link:hover {
+        .links a.doc {
+            background-color: #ea580c;
+        }
+
+        .links a.github {
+            background-color: #3498db;
+        }
+
+        .links a.github:hover {
             background-color: #2980b9;
+        }
+
+        .links a.doc:hover {
+            background-color: #c2410c;
         }
     </style>
 </head>
@@ -57,7 +73,10 @@
         <h1>Welcome to Hyper Php</h1>
         <p>Hyper Php is a sweet and MVT (Model-View-Template) based PHP tiny web framework designed to make web development faster and easier. Whether you're building a small project or a large application, Hyper Php provides a lightweight, flexible, and powerful foundation to get you started quickly.</p>
         <p>Explore the features, check out the documentation, and start building amazing web applications with Hyper Php today!</p>
-        <a class="github-link" href="https://github.com/vulcanphp/hyper">View on GitHub</a>
+        <div class="links">
+            <a class="doc" href="<?= public_url('readme.html') ?>">Read Documentation</a>
+            <a class="github" href="https://github.com/vulcanphp/hyper">View on GitHub</a>
+        </div>
     </div>
 </body>
 
