@@ -166,6 +166,54 @@ class student extends model {
 }
 </code></pre>
 
+        <p>To perform database operation using model, here is a simple example:
+        </p>
+        <pre><code># app/views/home.php
+
+use models\student;
+
+// create a new student
+$student = student::load(['name' => 'Shahin Moyshan', 'age' => 22]);
+$student->save();
+
+// find a student
+$student = student::find(1);
+var_dump($student);
+
+// remove a student
+$student->remove();
+
+// list of all students
+var_dump(student::get()->result());
+
+// paginate student
+var_dump(student::get()->paginate(20));
+
+// filter students
+var_dump(student::where('age >= 16')->result());
+
+// usage of builder from model
+$query = student::query();
+
+// insert records into `students` table using query builder
+$query->insert(['name' => 'Shahin Moyshan', 'age' => 22]);
+
+// delete records from `students` table using query builder
+$query->delete(['id' => [1, 2, 3]]);
+
+// update record into `students` table using query builder
+$query->update(['age' => 23], ['id' => 1]);
+
+// select records from `students` table using query builder
+var_dump(
+    $query->select('name, age')
+        ->where('age >= 16')
+        ->order('id DESC')
+        ->limit(10, 20)
+        ->result()
+);
+</code></pre>
+
         <h1 id="middlewares">Manage Middlewares</h1>
         <p>To add a new middleware, open the <u>app/web/middlewares.php</u> file and create a function that will
             process HTTP requests. After creating the function, register it in the router middleware array or globally
