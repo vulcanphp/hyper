@@ -67,6 +67,7 @@
         <a href="#middlewares">Manage Middlewares</a>
         <a href="#service-providers">Service Providers</a>
         <a href="#admin">Manage Admin</a>
+        <a href="#settings">Site Settings</a>
         <a href="#vite">Vite Usage</a>
         <a href="#learn-more">Learn More</a>
         <a href="#helpful-links">Helpful Links</a>
@@ -315,7 +316,43 @@ return [
         // Add a simple menu with a hardcoded string
         'api' => 'sakjadasdas5d1as54d5asd2asd1ds88sdf'
     ],
+    'settings' => [
+        // Register all grouped settings
+        'general' => [
+            // Register inputs for this group.
+            ['type' => 'text', 'name' => 'title']
+            ['type' => 'file', 'name' => 'logo']
+        ],
+    ],
 ];
+</code></pre>
+
+        <h1 id="settings">Site Settings</h1>
+        <p>You can get setting value that registered into <u>app/bootstrap.php</u> file under <mark>settings</mark>
+            array.
+        </p>
+        <pre><code>// get a setting with default value
+var_dump(setting('general', 'title', 'My Default Title'));
+
+// get settings instance
+var_dump(settings());
+
+// check if setting is defined or not
+if(settings()->has('general', 'title')) {
+
+}
+
+// change/update setting value
+settings()->set('general', 'title', 'My New Title');
+
+// remove a setting
+settings()->remove('general', 'title');
+
+// bulk update multiple settings
+settings()->setup('general', [
+    'title' => 'My New Title',
+    'logo' => './new/path/logo.png'
+]);
 </code></pre>
 
         <h1 id="vite">Vite Usage</h1>

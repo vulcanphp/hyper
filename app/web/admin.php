@@ -4,4 +4,5 @@ return [
     'user' => ['name' => 'admin', 'password' => 'admin'],
     'models' => [],
     'menus' => [],
+    'settings' => [],
 ];
