@@ -6,6 +6,6 @@ return [
     'lang' => 'en',
     'database' => [
         'driver' => 'sqlite',
-        'file' => __DIR__ . '/../sqlite.db'
+        'file' => __DIR__ . '/sqlite.db'
     ],
 ];
