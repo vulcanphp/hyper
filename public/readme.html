@@ -172,13 +172,19 @@ class student extends model {
 
 use models\student;
 
-// create a new student
-$student = student::load(['name' => 'Shahin Moyshan', 'age' => 22]);
+// save a new student
+$student = new student();
+$student->name = 'Shahin Moyshan';
+$student->age = 22;
 $student->save();
 
-// find a student
+// find a student model and update/remove it
 $student = student::find(1);
 var_dump($student);
+
+// update student model
+$student->age = 23;
+$student->save();
 
 // remove a student
 $student->remove();
@@ -186,13 +192,20 @@ $student->remove();
 // list of all students
 var_dump(student::get()->result());
 
-// paginate student
-var_dump(student::get()->paginate(20));
+// paginate with 20 students per page
+$paginator = student::get()->paginate(20);
+var_dump($paginator);
+
+// get data from paginator
+var_dump($paginator->getData());
+
+// get links from paginator
+var_dump($paginator->getLinks());
 
 // filter students
 var_dump(student::where('age >= 16')->result());
 
-// usage of builder from model
+// usage of query builder from model
 $query = student::query();
 
 // insert records into `students` table using query builder
@@ -210,7 +223,7 @@ var_dump(
         ->where('age >= 16')
         ->order('id DESC')
         ->limit(10, 20)
-        ->result()
+        ->result() // or ->paginate(20)
 );
 </code></pre>
 
