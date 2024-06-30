@@ -12,4 +12,12 @@ return new application(
     ],
     providers: ['checkSysLoadProvider', 'csrfProtectionProvider', [new admin(), 'setup']],
     middlewares: ['csrfProtectionMiddleware'],
+    env: [
+        'lang_dir' => __DIR__ . '/../public/i18n',
+        'tmp_dir' => __DIR__ . '/../public/tmp',
+        'upload_dir' => __DIR__ . '/../public/uploads',
+        'admin' => __DIR__ . '/web/admin.php',
+        'media_url' => '/public/uploads/',
+        'asset_url' => '/public/resources/',
+    ]
 );
