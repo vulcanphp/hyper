@@ -239,7 +239,7 @@ return new application(
 use models\department;
 use models\student;
 use admin\core\modelView;
-use views\settings;
+use views\backup;
 
 return [
     // Set up your admin panel login user
@@ -264,7 +264,7 @@ return [
     ],
     'menus' => [
         // Add a menu with views which will return a string
-        'settings' => [settings::class, 'index'],
+        'backup' => [backup::class, 'index'],
         // Add another menu with a file to get a string output
         'cms' => __DIR__ . '/../cms/index.php',
         // Add a simple menu with a hardcoded string
