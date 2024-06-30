@@ -5,67 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hyper Php - Sweet and MVT Based PHP Tiny Web Framework</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            margin-top: 50px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #3498db;
-        }
-
-        p {
-            line-height: 1.6;
-        }
-
-        .links {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .links a {
-            display: block;
-            margin: 20px 10px;
-            padding: 10px 20px;
-            text-align: center;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .links a.doc {
-            background-color: #ea580c;
-        }
-
-        .links a.github {
-            background-color: #3498db;
-        }
-
-        .links a.github:hover {
-            background-color: #2980b9;
-        }
-
-        .links a.doc:hover {
-            background-color: #c2410c;
-        }
-    </style>
+    <style>body {font-family: Arial, sans-serif;margin: 0;padding: 0;background-color: #f4f4f4;color: #333;}.container {width: 80%;margin: 0 auto;padding: 20px;background-color: #fff;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);border-radius: 8px;margin-top: 50px;}h1 {text-align: center;color: #3498db;}p {line-height: 1.6;}.links {display: flex;align-items: center;justify-content: center;}.links a {display: block;margin: 20px 10px;padding: 10px 20px;text-align: center;color: white;text-decoration: none;border-radius: 5px;transition: background-color 0.3s ease;}.links a.doc {background-color: #ea580c;}.links a.github {background-color: #3498db;}.links a.github:hover {background-color: #2980b9;}.links a.doc:hover {background-color: #c2410c;}</style>
 </head>
 
 <body>
