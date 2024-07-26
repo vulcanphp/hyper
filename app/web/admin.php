@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'user' => ['name' => 'admin', 'password' => 'admin'],
+    'user' => ['name' => 'admin', 'reset' => false],
     'models' => [],
     'menus' => [],
     'settings' => [],
