@@ -77,7 +77,7 @@
         <p>Explore the features, check out the documentation, and start building amazing web applications with Hyper Php
             today!</p>
         <div class="links">
-            <a class="doc" target="_blank" href="https://vulcanphp.github.io/hyper/docs">Read Documentation</a>
+            <a class="doc" target="_blank" href="https://vulcanphp.github.io/hyper">Read Documentation</a>
             <a class="github" href="https://github.com/vulcanphp/hyper">View on GitHub</a>
         </div>
     </div>
