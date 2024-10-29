@@ -20,5 +20,6 @@ php -S 127.0.0.1:8080
 **Note**: In a production environment, ensure all HTTP requests are redirected to the `public/` folder for security reasons.
 
 ## Links
+* [Hyper Docs](https://vuldanphp.github.io/vulcanphp/hyper/docs)
 * [Hyper Core](https://github.com/vulcanphp/hyper-core)
 * [Hyper Admin](https://github.com/vulcanphp/hyper-admin)
