@@ -42,7 +42,7 @@ return new application(
         'upload_dir' => __DIR__ . '/../public/uploads',
         'admin' => __DIR__ . '/web/admin.php',
         'admin_prefix' => '/admin',
-        'media_url' => '/public/uploads/',
-        'asset_url' => '/public/resources/',
+        'media_url' => '/uploads/',
+        'asset_url' => '/resources/',
     ]
 );
