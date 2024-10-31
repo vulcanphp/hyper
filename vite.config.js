@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [
         splitVendorChunkPlugin()
     ],
-    base: process.env.NODE_ENV === "production" ? '/public/resources/build/' : '/public/resources/',
+    base: process.env.NODE_ENV === "production" ? '/resources/build/' : '/resources/',
     root: './public/resources',
     server: {
         strictPort: true,
@@ -23,7 +23,7 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./public/resources', import.meta.url))
+            '@': fileURLToPath(new URL('./resources', import.meta.url))
         }
     }
 })
