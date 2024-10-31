@@ -21,5 +21,5 @@ php -S localhost:8080 -t public
 
 ## Links
 * [Hyper Docs](https://vulcanphp.github.io/hyper)
-* [Hyper Core](https://github.com/vulcanphp/hyper-core)
-* [Hyper Admin](https://github.com/vulcanphp/hyper-admin)
+* [Hyper Core](https://github.com/vulcanphp/hyper-core?tab=readme-ov-file#hypercore)
+* [Hyper Admin](https://github.com/vulcanphp/hyper-admin?tab=readme-ov-file#hyper-admin)
