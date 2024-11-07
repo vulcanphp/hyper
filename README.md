@@ -15,11 +15,11 @@ composer create-project vulcanphp/hyper myapp
 After installation, you can start the development server using:
 
 ```sh
-php -S 127.0.0.1:8080
+php -S localhost:8080 -t public
 ```
 **Note**: In a production environment, ensure all HTTP requests are redirected to the `public/` folder for security reasons.
 
 ## Links
 * [Hyper Docs](https://vulcanphp.github.io/hyper)
-* [Hyper Core](https://github.com/vulcanphp/hyper-core)
-* [Hyper Admin](https://github.com/vulcanphp/hyper-admin)
+* [Hyper Core](https://github.com/vulcanphp/hyper-core?tab=readme-ov-file#hypercore)
+* [Hyper Admin](https://github.com/vulcanphp/hyper-admin?tab=readme-ov-file#hyper-admin)
