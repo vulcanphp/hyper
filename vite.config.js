@@ -1,27 +1,26 @@
-import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vite'
-import path from 'path'
+import { defineConfig } from 'vite';
+import path from 'path';
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     plugins: [],
-    base: process.env.NODE_ENV === "production" ? '/resources/build/' : '/resources/',
-    root: './public/resources',
+    base: mode === 'production' ? '/resources/build/' : '/resources/',
+    root: path.resolve(__dirname, './public/resources'),
     server: {
         strictPort: true,
-        port: 5133
+        port: 5133,
     },
     build: {
-        outDir: './build',
+        outDir: path.resolve(__dirname, './public/resources/build'),
         emptyOutDir: true,
         manifest: true,
         rollupOptions: {
             input: path.resolve(__dirname, './public/resources/app.js'),
-        }
+        },
     },
     resolve: {
         alias: {
-            '@': fileURLToPath(new URL('./resources', import.meta.url))
-        }
-    }
-})
+            '@': path.resolve(__dirname, './resources'),
+        },
+    },
+}));
