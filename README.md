@@ -17,9 +17,8 @@ After installation, you can start the development server using:
 ```sh
 php -S localhost:8080 -t public
 ```
-**Note**: In a production environment, ensure all HTTP requests are redirected to the `public/` folder for security reasons.
+**Note**: In a production environment, ensure all HTTP requests are redirected to the `public` folder.
 
 ## Links
-* [Hyper Docs](https://vulcanphp.github.io/hyper)
-* [Hyper Core](https://github.com/vulcanphp/hyper-core?tab=readme-ov-file#hypercore)
-* [Hyper Admin](https://github.com/vulcanphp/hyper-admin?tab=readme-ov-file#hyper-admin)
+* [Sponsor](https://evolesoft.com)
+* [Hyper Documentation](https://vulcanphp.github.io/hyper)

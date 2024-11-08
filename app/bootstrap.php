@@ -5,7 +5,6 @@
  * Main application bootstrap file.
  */
 
-use admin\admin;
 use hyper\application;
 
 /**
@@ -34,15 +33,20 @@ return new application(
         __DIR__ . '/web/providers.php',
         __DIR__ . '/web/middlewares.php',
     ],
-    providers: ['csrfProtectionProvider', [new admin(), 'setup']],
+    providers: ['translatorProvider'],
     middlewares: ['csrfProtectionMiddleware'],
     env: [
-        'lang_dir' => __DIR__ . '/../public/i18n',
+        'lang_dir' => __DIR__ . '/i18n',
         'tmp_dir' => __DIR__ . '/../public/tmp',
         'upload_dir' => __DIR__ . '/../public/uploads',
         'admin' => __DIR__ . '/web/admin.php',
         'admin_prefix' => '/admin',
         'media_url' => '/uploads/',
         'asset_url' => '/resources/',
+        'lang' => 'en',
+        'database' => [
+            'driver' => 'sqlite',
+            'file' => __DIR__ . '/sqlite.db',
+        ],
     ]
 );

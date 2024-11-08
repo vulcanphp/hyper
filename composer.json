@@ -6,8 +6,7 @@
     "license": "MIT",
     "require": {
         "php": ">=8.2",
-        "vulcanphp/hyper-core": "^1.0",
-        "vulcanphp/hyper-admin": "^1.0"
+        "vulcanphp/hyper-core": "^1.0"
     },
     "authors": [
         {

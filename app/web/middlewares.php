@@ -11,8 +11,7 @@ use hyper\response;
  * It can be used to modify the request and response, as well as execute code before
  * or after the main application logic.
  *
- * @package hyper
- * @author Shahin Moyshan <shahin.moyshan2@gmail.com>
+ * @since 1.0.0
  */
 
 /**

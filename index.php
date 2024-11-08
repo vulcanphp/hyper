@@ -5,6 +5,8 @@
  *       SERVER PURPOSES ONLY, NOT FOR PRODUCTION SERVER.
  *       ON YOUR PRODUCTION SERVER, MAKE SURE YOUR NGINX AND
  *       APACHE SERVER REDIRECT ALL THE HTTP REQUESTS TO THE 'public' FOLDER.
+ * 
+ * After making sure the server is properly configured, you can remove this file.
  */
 
 // Get the requested URI and decode it
@@ -19,7 +21,7 @@ $publicDir = __DIR__ . '/public';
  * Redirect requests with trailing slashes if the resource is not a directory.
  * This handles cases where a trailing slash is present in the URI but the path is not a directory.
  */
-if (preg_match('/\/$/', $uri) && !is_dir($publicDir . $uri)) {
+if (preg_match('/\/$/', $uri) && !is_dir("$publicDir$uri")) {
     header('Location: ' . rtrim($uri, '/'), true, 301);
     exit();
 }
@@ -38,5 +40,5 @@ if (file_exists($filePath) && is_file($filePath)) {
  * Route all other requests to index.php for further handling.
  * This is typical for single-page applications or when using a front controller pattern.
  */
-require $publicDir . '/index.php';
+require "$publicDir/index.php";
 

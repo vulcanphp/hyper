@@ -11,7 +11,7 @@
 // define application root directory path.
 define('ROOT_DIR', dirname(__DIR__));
 
-// include composer autoloader
+// include composer autoload
 require __DIR__ . '/../vendor/autoload.php';
 
 /**

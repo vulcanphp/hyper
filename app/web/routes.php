@@ -12,8 +12,6 @@
  * You can add as many routes as you want, and they will be executed in the order
  * they are defined.
  * 
- * @package hyper
- * @author Shahin Moyshan <shahin.moyshan2@gmail.com>
  * @since 1.0.0
  */
 

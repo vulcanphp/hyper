@@ -9,5 +9,5 @@
  * generates a bundle that can be loaded by the browser.
  *
  * @module app
- * @author Shahin Moyshan <shahin.moyshan2@gmail.com>
+ * @since 1.0.0
  */
