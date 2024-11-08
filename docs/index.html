@@ -69,29 +69,29 @@
         <a href="#admin">Manage Admin</a>
         <a href="#settings">Site Settings</a>
         <a href="#vite">Vite Usage</a>
-        <a href="#learn-more">Learn More</a>
-        <a href="#helpful-links">Helpful Links</a>
+        <a href="#hyper-core">**Hyper Core</a>
     </div>
     <div class="content">
         <h1 id="installation">Installation</h1>
         <p>It is recommended to use <a href="https://getcomposer.org/">Composer</a> to install Hyper.</p>
         <pre><code>composer create-project vulcanphp/hyper myapp</code></pre>
-        <p>Run the development server using:</p>
-        <pre><code>php -S 127.0.0.1:8080</code></pre>
+        <p>Then go to project root directory and run the development server using:</p>
+        <pre><code>php -S localhost:8080 -t public</code></pre>
+        <p>Then open: <a target="_blank" href="http://localhost:8080">http://localhost:8080</a></p>
         <p><strong>Note:</strong> In a production server, make sure all HTTP requests are redirected to the
-            <u>public/</u> folder for security reasons.
+            <u>public/</u> folder.
         </p>
 
         <h1 id="folder-structure">Folder Structure</h1>
         <pre><code>root
 ├── app
+│   ├── i18n
 │   ├── models
 │   ├── templates
 │   ├── views
 │   └── web
 │
 ├── public
-│   ├── i18n
 │   ├── resources
 │   ├── tmp
 │   └── uploads
@@ -111,22 +111,19 @@ return new application(
         __DIR__ . '/web/providers.php',
         __DIR__ . '/web/middlewares.php',
     ],
-    providers: ['checkSysLoadProvider', 'csrfProtectionProvider', [new admin(), 'setup']],
+    providers: ['setYourCustomProvider'],
     middlewares: ['csrfProtectionMiddleware'],
     env: [
-        'debug' => false,
-        'secret' => 'c52f493a81826ba866af6bb66a8c67802caf1e1d',
+        'lang' => 'en',
+        'lang_dir' => __DIR__ . '/i18n',
+        'tmp_dir' => __DIR__ . '/../public/tmp',
+        'upload_dir' => __DIR__ . '/../public/uploads',
+        'media_url' => '/uploads/',
+        'asset_url' => '/resources/',
         'database' => [
             'driver' => 'sqlite',
             'file' => __DIR__ . '/../sqlite.db'
         ],
-        'lang' => 'en',
-        'lang_dir' => __DIR__ . '/../public/i18n',
-        'tmp_dir' => __DIR__ . '/../public/tmp',
-        'upload_dir' => __DIR__ . '/../public/uploads',
-        'media_url' => '/public/uploads/',
-        'asset_url' => '/public/resources/',
-        'admin' => __DIR__ . '/web/admin.php',
     ],
 );
 </code></pre>
@@ -139,7 +136,6 @@ return [
     ['path' => '/', 'template' => 'welcome'],
     ['path' => '/about', 'callback' => fn() => 'About Us Page', 'name' => 'about'],
     ['path' => '/account', 'callback' => [account::class, 'index'], 'middleware' => ['checkLogin']],
-    ['path' => '/login', 'method' => ['GET', 'POST'], 'callback' => [account::class, 'signIn']],
 ];
 </code></pre>
 
@@ -148,16 +144,11 @@ return [
         <pre><code># app/views/account.php
 
 namespace views;
-use hyper\request;
 
 class account {
 
-    function index(){}
-
-    function signIn(request $request){
-        if($request->method === 'POST'){
-            var_dump($request->all());
-        }
+    public function index() {
+        return template('account', ['name' => 'John Doe']);
     }
 
 }
@@ -173,7 +164,7 @@ class account {
         &lt;title&gt;&lt;?= $title ?&gt;&lt;/title&gt;
     &lt;/head&gt;
     &lt;body&gt;
-        &lt;?= $this-&gt;template(&quot;includes/header&quot;) ?&gt;
+        &lt;?= $template-&gt;include(&quot;includes/header&quot;) ?&gt;
         &lt;?= $content ?&gt;
     &lt;/body&gt;
 &lt;/html&gt;
@@ -189,8 +180,8 @@ class account {
         <pre><code># app/templates/welcome.php
 
 &lt;?php
-$this-&gt;layout(&quot;layout&quot;);
-$this-&gt;set(&quot;title&quot;, &quot;Welcome to Hyper&quot;);
+$template-&gt;layout(&quot;layout&quot;);
+$template-&gt;set(&quot;title&quot;, &quot;Welcome to Hyper&quot;);
 ?&gt;
 
 &lt;h2&gt;Hyper PHP is a Sweet and MVT Based PHP Tiny Web Framework&lt;/h2&gt;
@@ -336,6 +327,7 @@ return new application(
     providers: [[new admin(), 'setup']],
     env: [
         'admin' => __DIR__ . '/web/admin.php',
+        'admin_prefix' => 'admin'
     ],
     ...
 );
@@ -447,11 +439,512 @@ settings()->setup('general', [
 &lt;/html&gt;
 </code></pre>
 
-        <h1 id="learn-more">Learn More</h1>
+        <h1 id="hyper-core">**Hyper Core</h1>
+        <p><strong>HyperCore</strong> is the backbone of the Hyper MVT Framework, providing essential core classes,
+            utility functions, and helper methods to streamline web development. This document details all available
+            classes and functions within the HyperCore.</p>
+        <h2 id="core-classes">Core Classes</h2>
+        <h3 id="application">Application</h3>
         <ul>
-            <li><a href="https://github.com/vulcanphp/hyper-core?tab=readme-ov-file#hypercore">Hyper Core</a></li>
-            <li><a href="https://github.com/vulcanphp/hyper-admin?tab=readme-ov-file#hyper-admin">Hyper Admin</a></li>
+            <li><strong>Class:</strong> <u>application</u></li>
+            <li><strong>Description:</strong> Application container that manages the overall lifecycle of your
+                application.</li>
         </ul>
+        <h3 id="database">Database</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>database</u></li>
+            <li><strong>Description:</strong> PDO database container for managing database connections and operations.
+            </li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\database;
+$database = new database([
+    // sqlite, mysql, pgsql, cubrid, dblib, firebird, ibm, informix, sqlsrv, oci, odbc
+    &#39;driver&#39; =&gt; &#39;sqlite&#39;,
+
+    // required when driver is sqlite
+    &#39;file&#39; =&gt; __DIR__ . &#39;/../sqlite.db&#39;,
+
+    // pre-define a custom dsn for pdo else, it will auto genere a dsn from this config array.
+    &#39;dsn&#39; =&gt; null,
+
+    // define your custom pdo options. Note: PDO::ATTR_ERRMODE =&gt; PDO::ERRMODE_EXCEPTION added as default.
+    &#39;options&#39; =&gt; [],
+
+    // when driver is serverside
+    &#39;host&#39; =&gt; &#39;localhost&#39;,
+    &#39;user&#39; =&gt; &#39;{user}&#39;,
+    &#39;password&#39; =&gt; &#39;{password}&#39;,
+    &#39;port&#39; =&gt; 3306,
+    &#39;name&#39; =&gt; &#39;dbname&#39;,
+    &#39;charset&#39; =&gt; &#39;utf8mb4&#39;
+
+    // Learn more: https://www.php.net/manual/en/book.pdo.php
+]);
+dump($database-&gt;prepare(&#39;SELECT * FROM students&#39;));
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="request">Request</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>request</u></li>
+            <li><strong>Description:</strong> HTTP request class for handling and processing incoming requests.</li>
+        </ul>
+        <h3 id="response">Response</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>response</u></li>
+            <li><strong>Description:</strong> HTTP response class for managing outgoing responses.</li>
+        </ul>
+        <h3 id="middleware">Middleware</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>middleware</u></li>
+            <li><strong>Description:</strong> Middleware class for handling HTTP request routing.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\middleware;
+
+$middleware = new middleware();
+$middleware-&gt;add(callback);
+$middleware-&gt;handle(request: $request);
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="router">Router</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>router</u></li>
+            <li><strong>Description:</strong> Router class for defining and handling application routes.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\router;
+
+$router = new router(middleware: $middleware);
+$router-&gt;add(&#39;/&#39;, fn() =&gt; &#39;Hello World&#39;);
+$response = $router-&gt;dispatch();
+$response-&gt;send();
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="model">Model</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>model</u></li>
+            <li><strong>Description:</strong> Model class for handling database interactions with ORM and form handling.
+            </li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\model;
+
+class student extends model {
+    protected string $table = &#39;students&#39;;
+
+    public string $name;
+    public int $age;
+    public string $department;
+}
+
+dump(student::get()-&gt;result());
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="query">Query</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>query</u></li>
+            <li><strong>Description:</strong> PHP PDO query builder for constructing and executing database queries.
+            </li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\query;
+$query = new query(database: $database, table: &#39;students&#39;);
+dump($query-&gt;result());
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="session">Session</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>session</u></li>
+            <li><strong>Description:</strong> Session class for managing user sessions.</li>
+        </ul>
+        <h3 id="template">Template</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>template</u></li>
+            <li><strong>Description:</strong> Template engine class for rendering views.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\template;
+$template = new template(__DIR__);
+dump($template-&gt;render(&#39;welcome&#39;, [&#39;message&#39; =&gt; &#39;Welcome to App&#39;]));
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="translator">Translator</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>translator</u></li>
+            <li><strong>Description:</strong> Translator helper class to retrieve translated text.</li>
+        </ul>
+        <h2 id="utility-classes">Utility Classes</h2>
+        <h3 id="cache">Cache</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>cache</u></li>
+            <li><strong>Description:</strong> Cache class for caching data.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\utils\cache;
+$cache = new cache(&#39;home&#39;);
+dump($cache-&gt;load(&#39;time&#39;, fn() =&gt; &#39;Now :&#39; . time(), &#39;5 minutes&#39;));
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="collect">Collect</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>collect</u></li>
+            <li><strong>Description:</strong> Collection class for handling arrays.</li>
+        </ul>
+        <h3 id="form">Form</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>form</u></li>
+            <li><strong>Description:</strong> Form builder class for constructing and managing forms.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\utils\form;
+
+// independent usage
+$form = new form(request: $request, fields: [[&#39;type&#39; =&gt; &#39;text&#39;, &#39;name&#39; =&gt; &#39;name&#39;]]);
+// usage from model
+$form = new form(request: $request, model: $student);
+
+// add new form field
+$form-&gt;add([&#39;type&#39; =&gt; &#39;email&#39;, &#39;name&#39; =&gt; &#39;email&#39;, &#39;required&#39; =&gt; true]);
+
+// validate form
+if($form-&gt;validate()){
+    dump($form-&gt;getData());
+}else{
+    echo $form-&gt;render();
+}
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="hash">Hash</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>hash</u></li>
+            <li><strong>Description:</strong> Class for hashing and encryption.</li>
+        </ul>
+        <h3 id="image">Image</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>image</u></li>
+            <li><strong>Description:</strong> Image helper class for managing image operations.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\utils\image;
+$image = new image(__DIR__ . &#39;/image.png&#39;);
+$image-&gt;compress(50);
+$image-&gt;resize(720, 360);
+$image-&gt;rotate(90);
+$image-&gt;bulkResize([540 =&gt; 540, 60 =&gt; 60]);
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="paginator">Paginator</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>paginator</u></li>
+            <li><strong>Description:</strong> Paginator class for handling pagination.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\utils\paginator;
+$paginator = new paginator(total: 500, limit: 20);
+$paginator-&gt;setData([...]);
+dump($paginator-&gt;getData(), $paginator-&gt;getLinks());
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="ping">Ping</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>ping</u></li>
+            <li><strong>Description:</strong> HTTP ping/cURL helper class.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\utils\ping;
+$http = new ping();
+$http-&gt;download(__DIR__.&#39;/downloads/file.jpg&#39;);
+dump($http-&gt;get(&#39;http://domain.com/download-file&#39;));
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="uploader">Uploader</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>uploader</u></li>
+            <li><strong>Description:</strong> File uploader class for managing file uploads.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\utils\uploader;
+$uploader = new uploader(uploadDir: __DIR__ .&#39;/uploads&#39;, extensions: [&#39;jpe&#39;, &#39;png&#39;], multiple: true);
+dump($uploader-&gt;upload($_FILES[&#39;upload&#39;]));
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="validator">Validator</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>validator</u></li>
+            <li><strong>Description:</strong> HTTP input validator class.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\utils\validator;
+$validator = new validator();
+dump($validator-&gt;validate([
+    &#39;name&#39; =&gt; [&#39;required&#39;, &#39;min:10&#39;, &#39;max:60&#39;],
+    &#39;email&#39; =&gt; [&#39;required&#39;, &#39;email&#39;],
+], $request-&gt;all()));
+</code></pre>
+            </li>
+        </ul>
+        <h2 id="helper-classes">Helper Classes</h2>
+        <h3 id="form-1">Form</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>form</u></li>
+            <li><strong>Description:</strong> Trait for model to extract form fields from model object properties.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\model;
+use hyper\helpers\form;
+
+class student extends model {
+    use form;
+
+    protected function form(): array {
+        return [
+            &#39;name&#39; =&gt; [&#39;type&#39; =&gt; &#39;text&#39;, &#39;required&#39; =&gt; true],
+            &#39;email&#39; =&gt; [&#39;type&#39; =&gt; &#39;email&#39;, &#39;required&#39; =&gt; true],
+            &#39;gender&#39; =&gt; [&#39;type&#39; =&gt; &#39;radio&#39;, &#39;options&#39; =&gt; [&#39;M&#39; =&gt; &#39;Male&#39;, &#39;F&#39; =&gt; &#39;Female&#39;]],
+        ];
+    }
+}
+
+$form = new form(request: $request, model: new student());
+dump($form-&gt;render());
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="mail">Mail</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>mail</u></li>
+            <li><strong>Description:</strong> PHP built-in mail class.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\helpers\mail;
+$mail = new mail();
+$mail-&gt;address(&#39;john.doe@main.com&#39;, &#39;John Doe&#39;);
+$mail-&gt;replyTo(&#39;shahin.moyshan2@gmail.com&#39;);
+$mail-&gt;subject(&#39;Test Mail&#39;);
+$mail-&gt;body(&#39;Hello World, This is Test Mail From Shahin Moyshan&#39;);
+$mail-&gt;send();
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="orm">ORM</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>orm</u></li>
+            <li><strong>Description:</strong> Object-Relational Mapper for database interactions.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\model;
+use hyper\helpers\orm;
+
+class student extends model {
+    use orm;
+
+    protected function orm(): array {
+        return [
+            &#39;department&#39; =&gt; [&#39;has&#39; =&gt; &#39;one&#39;, &#39;model&#39; =&gt; department::class, &#39;lazy&#39; =&gt; false],
+            &#39;subjects&#39; =&gt; [&#39;has&#39; =&gt; &#39;many-x&#39;, &#39;model&#39; =&gt; subject::class, &#39;table&#39; =&gt; &#39;students_subjects&#39;],
+            &#39;results&#39; =&gt; [&#39;has&#39; =&gt; &#39;many&#39;, &#39;model&#39; =&gt; result::class, &#39;formIgnore&#39; =&gt; true],
+        ];
+    }
+}
+
+dump(student::with([&#39;subjects&#39;, &#39;results&#39;, &#39;department&#39;])-&gt;paginate(20));
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="uploader-1">Uploader</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>uploader</u></li>
+            <li><strong>Description:</strong> Uploader helper for managing model uploads.</li>
+            <li><strong>Example:</strong>
+                <pre><code class="language-php">use hyper\model;
+use hyper\helpers\uploader;
+
+class student extends model {
+    use uploader;
+
+    protected function uploader(): array {
+        return [
+            [
+                &#39;name&#39; =&gt; &#39;photo&#39;,
+                &#39;multiple&#39; =&gt; false,
+                &#39;uploadTo&#39; =&gt; &#39;students&#39;,
+                &#39;maxSize&#39; =&gt; 1048576, // 1MB
+                &#39;compress&#39; =&gt; 75,
+                &#39;resize&#39; =&gt; [540 =&gt; 540],
+                &#39;resizes&#39; =&gt; [140 =&gt; 140, 60 =&gt; 60]
+            ]
+        ];
+    }
+}
+</code></pre>
+            </li>
+        </ul>
+        <h3 id="settings">Settings</h3>
+        <p>You can get setting value from local settings files, where you may store anu non-confidencial data, such as:
+            site title, description etc..</p>
+        <pre><code class="language-php">// get a setting with default value
+dump(setting(&#39;general&#39;, &#39;title&#39;, &#39;My Default Title&#39;));
+
+// get settings instance
+dump(settings());
+
+// check if setting value is exists
+dump(settings()-&gt;has(&#39;general&#39;, &#39;title&#39;));
+
+// Set a setting value
+settings()-&gt;set(&#39;general&#39;, &#39;title&#39;, &#39;My Site Title&#39;);
+
+// Remove a setting value
+settings()-&gt;remove(&#39;general&#39;, &#39;title&#39;);
+</code></pre>
+        <h3 id="vite">Vite</h3>
+        <ul>
+            <li><strong>Class:</strong> <u>vite</u></li>
+            <li><strong>Description:</strong> Vite helper class for asset management.</li>
+        </ul>
+        <h2 id="shortcut-functions">Shortcut Functions</h2>
+        <h3 id="application-1">Application</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>app()</u></li>
+            <li><strong>Description:</strong> Returns the application instance.</li>
+        </ul>
+        <h3 id="request-1">Request</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>request()</u></li>
+            <li><strong>Description:</strong> Returns the request instance.</li>
+        </ul>
+        <h3 id="response-1">Response</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>response()</u></li>
+            <li><strong>Description:</strong> Returns the response instance.</li>
+        </ul>
+        <h3 id="redirect">Redirect</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>redirect()</u></li>
+            <li><strong>Description:</strong> Redirects to a different URL and returns void.</li>
+        </ul>
+        <h3 id="session-1">Session</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>session()</u></li>
+            <li><strong>Description:</strong> Returns the session instance.</li>
+        </ul>
+        <h3 id="router-1">Router</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>router()</u></li>
+            <li><strong>Description:</strong> Returns the router instance.</li>
+        </ul>
+        <h3 id="input">Input</h3>
+        <ul>
+            <li><strong>Functions:</strong>
+                <ul>
+                    <li><u>validator()</u> - Validates the given data from request.</li>
+                    <li><u>input()</u> - Retrieve and sanitize input data.</li>
+                </ul>
+            </li>
+        </ul>
+        <h3 id="database-1">Database</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>database()</u></li>
+            <li><strong>Description:</strong> Returns the database instance.</li>
+        </ul>
+        <h3 id="query-1">Query</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>query()</u></li>
+            <li><strong>Description:</strong> Returns the query builder instance.</li>
+        </ul>
+        <h3 id="template-1">Template</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>template()</u></li>
+            <li><strong>Description:</strong> Returns a new template instance.</li>
+        </ul>
+        <h3 id="urls">URLs</h3>
+        <ul>
+            <li><strong>Functions:</strong>
+                <ul>
+                    <li><u>url(string $path = &#39;&#39;): string</u> - Returns the URL for the given path.</li>
+                    <li><u>public_url(string $path = &#39;&#39;): string</u> - Returns the public URL for the
+                        given path.</li>
+                    <li><u>asset_url(string $path = &#39;&#39;): string</u> - Returns the asset URL for the given
+                        path.</li>
+                    <li><u>media_url(string $path = &#39;&#39;): string</u> - Returns the media URL for the given
+                        path.</li>
+                    <li><u>request_url()</u> - Returns the current requested URL.</li>
+                    <li><u>route_url()</u> - Returns the route URL.</li>
+                </ul>
+            </li>
+        </ul>
+        <h3 id="directories">Directories</h3>
+        <ul>
+            <li><strong>Functions:</strong>
+                <ul>
+                    <li><u>app_dir()</u> - Returns the application directory.</li>
+                    <li><u>root_dir()</u> - Returns the root directory.</li>
+                </ul>
+            </li>
+        </ul>
+        <h3 id="debugging">Debugging</h3>
+        <ul>
+            <li><strong>Functions:</strong>
+                <ul>
+                    <li><u>dump()</u> - Dumps data for inspection.</li>
+                    <li><u>dd()</u> - Dumps data and stops execution.</li>
+                </ul>
+            </li>
+        </ul>
+        <h3 id="environment">Environment</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>env()</u></li>
+            <li><strong>Description:</strong> Gets application environment variable data.</li>
+        </ul>
+        <h3 id="csrf">CSRF</h3>
+        <ul>
+            <li><strong>Functions:</strong>
+                <ul>
+                    <li><u>csrf_token()</u> - Returns the CSRF token.</li>
+                    <li><u>csrf()</u> - Returns the CSRF token with an HTML hidden input.</li>
+                </ul>
+            </li>
+        </ul>
+        <h3 id="user">User</h3>
+        <ul>
+            <li><strong>Function:</strong>
+                <ul>
+                    <li><u>user()</u> - Returns the logged-in user.</li>
+                    <li><u>is_quest()</u> - Determine if a user logged-in or not.</li>
+                </ul>
+            </li>
+        </ul>
+        <h3 id="collections">Collections</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>collect()</u></li>
+            <li><strong>Description:</strong> Returns a new collect class instance.</li>
+        </ul>
+        <h3 id="cache-1">Cache</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>cache()</u></li>
+            <li><strong>Description:</strong> Returns a new cache class instance.</li>
+        </ul>
+        <h3 id="translation">Translation</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>__()</u></li>
+            <li><strong>Description:</strong> Translates text.</li>
+        </ul>
+        <h3 id="vite-1">Vite</h3>
+        <ul>
+            <li><strong>Function:</strong> <u>vite()</u></li>
+            <li><strong>Description:</strong> Returns a new vite class instance.</li>
+        </ul>
+        <h3 id="templates">Templates</h3>
+        <ul>
+            <li><strong>Functions:</strong>
+                <ul>
+                    <li><u>template_exists()</u> - Checks if a template exists.</li>
+                    <li><u>_e()</u> - Escapes a string for safe output.</li>
+                </ul>
+            </li>
+        </ul>
+        <h2 id="conclusion">Conclusion</h2>
+        <p>HyperCore provides a set of core functionalities, utility methods, and helper classes to make web development
+            with the Hyper MVT Framework efficient and enjoyable. Whether you are handling HTTP requests, managing
+            databases, or working with templates, HyperCore has you covered.</p>
+
 
         <h1 id="helpful-links">Helpful Links</h1>
         <ul>
