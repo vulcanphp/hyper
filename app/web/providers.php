@@ -1,6 +1,7 @@
 <?php
 
 use hyper\application;
+use hyper\tracer;
 use hyper\translator;
 
 /**
@@ -12,6 +13,24 @@ use hyper\translator;
  *
  * @since 1.0.0
  */
+
+/**
+ * Error Tracer service provider.
+ *
+ * If the application is in debug mode, this provider enables the error
+ * tracer to log errors and exceptions to the console.
+ *
+ * @param application $app
+ *   The application instance.
+ *
+ * @return void
+ */
+function errorTracerProvider(application $app)
+{
+    if ($app->env['debug']) {
+        tracer::trace();
+    }
+}
 
 /**
  * Translator service provider.
