@@ -20,5 +20,4 @@ php -S localhost:8080 -t public
 **Note**: In a production environment, ensure all HTTP requests are redirected to the `public` folder.
 
 ## Links
-* [Sponsor](https://evolesoft.com)
 * [Hyper Documentation](https://vulcanphp.github.io/hyper)
