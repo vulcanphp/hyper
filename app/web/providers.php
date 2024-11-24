@@ -44,5 +44,7 @@ function errorTracerProvider(application $app)
  */
 function translatorProvider(application $app)
 {
-    $app->translator = new translator($app->env['lang'], $app->env['lang_dir']);
+    $app->translator = new translator(
+        require $app->env['lang_dir'] . '/' . $app->env['lang'] . '.php'
+    );
 }
